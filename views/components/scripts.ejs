@@ -1,0 +1,191 @@
+<!-- ================================================
+jQuery Library
+================================================ -->
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+
+<!-- ================================================
+Bootstrap Core JavaScript File
+================================================ -->
+<script src="/js/bootstrap/bootstrap.min.js"></script>
+
+<!-- ================================================
+Plugin.js - Some Specific JS codes for Plugin Settings
+================================================ -->
+<script type="text/javascript" src="/js/plugins.js"></script>
+
+<!-- ================================================
+Bootstrap Select
+================================================ -->
+<script type="text/javascript" src="/js/bootstrap-select/bootstrap-select.js"></script>
+
+<!-- ================================================
+Bootstrap Toggle
+================================================ -->
+<script type="text/javascript" src="/js/bootstrap-toggle/bootstrap-toggle.min.js"></script>
+
+<!-- ================================================
+Bootstrap WYSIHTML5
+================================================ -->
+<!-- main file -->
+<script type="text/javascript" src="/js/bootstrap-wysihtml5/wysihtml5-0.3.0.min.js"></script>
+<!-- bootstrap file -->
+<script type="text/javascript" src="/js/bootstrap-wysihtml5/bootstrap-wysihtml5.js"></script>
+
+<!-- ================================================
+Summernote
+================================================ -->
+<script type="text/javascript" src="/js/summernote/summernote.min.js"></script>
+
+<!-- ================================================
+Flot Chart
+================================================ -->
+<!-- main file -->
+<script type="text/javascript" src="/js/flot-chart/flot-chart.js"></script>
+<!-- time.js -->
+<script type="text/javascript" src="/js/flot-chart/flot-chart-time.js"></script>
+<!-- stack.js -->
+<script type="text/javascript" src="/js/flot-chart/flot-chart-stack.js"></script>
+<!-- pie.js -->
+<script type="text/javascript" src="/js/flot-chart/flot-chart-pie.js"></script>
+<!-- demo codes -->
+<script type="text/javascript" src="/js/flot-chart/flot-chart-plugin.js"></script>
+
+<!-- ================================================
+Chartist
+================================================ -->
+<!-- main file
+<script type="text/javascript" src="js/chartist/chartist.js"></script>
+
+<script type="text/javascript" src="js/chartist/chartist-plugin.js"></script>-->
+
+<!-- ================================================
+Easy Pie Chart
+================================================ -->
+<!-- main file -->
+<script type="text/javascript" src="/js/easypiechart/easypiechart.js"></script>
+<!-- demo codes -->
+<script type="text/javascript" src="/js/easypiechart/easypiechart-plugin.js"></script>
+
+<!-- ================================================
+Sparkline
+================================================ -->
+<!-- main file -->
+<script type="text/javascript" src="/js/sparkline/sparkline.js"></script>
+<!-- demo codes -->
+<script type="text/javascript" src="/js/sparkline/sparkline-plugin.js"></script>
+
+<!-- ================================================
+Rickshaw
+================================================ -->
+<!-- d3 -->
+<script src="js/rickshaw/d3.v3.js"></script>
+<!-- main file -->
+<script src="/js/rickshaw/rickshaw.js"></script>
+<!-- demo codes -->
+<script src="/js/rickshaw/rickshaw-plugin.js"></script>
+
+<!-- ================================================
+Data Tables
+================================================ -->
+<script src="/js/datatables/datatables.min.js"></script>
+
+<!-- ================================================
+Sweet Alert
+================================================ -->
+<script src="/js/sweet-alert/sweet-alert.min.js"></script>
+
+<!-- ================================================
+Kode Alert
+================================================ -->
+<script src="/js/kode-alert/main.js"></script>
+
+<!-- ================================================
+Gmaps
+================================================ -->
+<!-- google maps api
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>-->
+<!-- main file
+<script src="js/gmaps/gmaps.js"></script>-->
+<!-- demo codes
+<script src="js/gmaps/gmaps-plugin.js"></script>-->
+
+<!-- ================================================
+jQuery UI
+================================================ -->
+<script type="text/javascript" src="/js/jquery-ui/jquery-ui.min.js"></script>
+
+<!-- ================================================
+Moment.js
+================================================ -->
+<script type="text/javascript" src="/js/moment/moment.min.js"></script>
+
+<!-- ================================================
+Full Calendar
+================================================ -->
+<script type="text/javascript" src="/js/full-calendar/fullcalendar.js"></script>
+
+<!-- ================================================
+Bootstrap Date Range Picker
+================================================ -->
+<script type="text/javascript" src="/js/date-range-picker/daterangepicker.js"></script>
+
+<!-- ================================================
+Other
+================================================ -->
+<script src="/js/socket.js"></script>
+<script src="/js/sweetalert2.all.min.js"></script>
+<script src="/js/js.cookie.min.js"></script>
+<script src="/js/vue.js"></script>
+<script src="/js/vue-social-sharing.min.js"></script>
+<script src="/js/intlTelInput.js"></script>
+
+<script> var thisUrl = location.protocol + '//' + location.host;
+    var socket = io.connect(thisUrl);
+
+    Number.prototype.trimNum = function (places, rounding) {
+        rounding = rounding || "round";
+        var num = parseFloat(this), multiplier = Math.pow(10, places);
+        return (Number(Math[rounding](num * multiplier) / multiplier));
+    }
+
+</script>
+
+<script src="/js/popper.min.js"></script>
+<script src="/js/tippy-bundle.umd.js"></script>
+
+<!-- Include the PayPal JavaScript SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=<%=locals.payPalClientId%>&currency=<%=locals.payPalCurrency%>"></script>
+
+<!--script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+        style: {
+            color:  'blue',
+            shape:  'pill',
+            label:  'pay',
+            height: 40
+        },
+
+        // Set up the transaction
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '0.01'
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // Show a success message to the buyer
+                alert('Transaction completed by ' + details.payer.name.given_name + '!');
+            });
+        }
+
+
+    }).render('#paypal-button-container');
+</script-->

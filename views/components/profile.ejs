@@ -1,0 +1,29 @@
+<script type="text/javascript">
+    Vue.component('profile', {
+        name: 'profile',
+        props: ['userObj', 'profileData', 'usersOnline'],
+        template: `<%- include ('profile.vue') %>`,
+        data: function () {
+            return {
+
+            }
+        },
+        mounted () {
+            socket.on('userDisconnect', function (obj) {
+                if (obj.error){
+                    console.log('Error in disconnect: ', obj.error)
+                } else {
+                    if (app.profileData.id === obj.userId){
+                        app.profileData.online = obj.lastOnline;
+                    }
+                }
+            });
+
+            socket.on('userConnect', function (id) {
+                if (app.profileData.id === id){
+                    app.profileData.online = 'online';
+                }
+            });
+        }
+    });
+</script>

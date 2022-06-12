@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Kode is a Premium Bootstrap Admin Template, It's responsive, clean coded and mobile friendly">
+    <meta name="keywords" content="bootstrap, admin, dashboard, flat admin template, responsive,"/>
+    <title><%- locals.title %></title>
+
+    <!-- ========== Css Files ========== -->
+    <link href="/css/root.css" rel="stylesheet">
+    <link rel="canonical" href="https://swenlii-delivery.ru">
+    <link rel="stylesheet" href="/css/intlTelInput.css">
+
+
+</head>
+<body>
+<div id="wrapper">
+    <!-- Start Page Loading -->
+    <div class="loading"><img src="/img/loading.gif" alt="loading-img"></div>
+    <!-- End Page Loading -->
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+    <!-- START TOP -->
+    <div id="top" class="clearfix">
+
+        <!-- Start App Logo -->
+        <div class="applogo">
+            <a href="/" style="cursor: pointer" class="logo">Swenlii's Delivery</a>
+        </div>
+        <!-- End App Logo -->
+
+        <!-- Start Sidebar Show Hide Button -->
+        <a href="/#blank" class="sidebar-open-button"><i class="fa fa-bars"></i></a>
+        <a href="/#blank" class="sidebar-open-button-mobile"><i class="fa fa-bars"></i></a>
+        <!-- End Sidebar Show Hide Button -->
+
+        <!-- Start Searchbox -->
+        <form class="searchform">
+            <input type="text" class="searchbox googlemaps-autocomplete" id="searchbox" placeholder="Search">
+            <button class="searchbutton"><i class="fa fa-search"></i></button>
+        </form>
+        <!-- End Searchbox -->
+
+        <!-- Start Top Menu -->
+        <ul class="topmenu">
+            <li><a href="/#my-orders">Orders</a></li>
+            <li><a href="/#reviews-page">Reviews</a></li>
+        </ul>
+        <!-- End Top Menu -->
+
+        <!-- Start Sidepanel Show-Hide Button -->
+        <a href="/#sidepanel" class="sidepanel-open-button"><i class="fa fa-outdent"></i></a>
+        <!-- End Sidepanel Show-Hide Button -->
+
+        <!-- Start Top Right -->
+        <ul class="top-right">
+
+            <li class="dropdown link">
+                <a href="/#blank" data-toggle="dropdown" class="dropdown-toggle hdbutton">Create New <span
+                            class="caret"></span></a>
+                <ul class="dropdown-menu dropdown-menu-list">
+                    <li><a href="/#create-order"><i class="fa falist fa-cube"></i>Order</a></li>
+                    <li><a href="/#reviews-page"><i class="fa falist fa-edit"></i>Review</a></li>
+                    <li><a href="/register"><i class="fa falist fa-user-plus"></i>Account</a></li>
+                </ul>
+            </li>
+
+            <li class="dropdown link">
+                <a href="/#" data-toggle="dropdown" class="dropdown-toggle profilebox"><img :src="userObj && userObj.avatarPath ? '/img/users/' + userObj.avatarPath : '/img/user-avatar-placeholder.png'"
+                                                                                           alt="img"><b><%- locals.userObj && locals.userObj.name ? locals.userObj.name : 'Login' %></b><span
+                            class="caret"></span></a>
+                <ul class="dropdown-menu dropdown-menu-list dropdown-menu-right">
+                    <li v-if="userObj" role="presentation" class="dropdown-header">Profile</li>
+                    <li v-if="userObj"><a href="/#create-order"><i class="fa falist fa-plus"></i> Create order</a></li>
+                    <li v-if="userObj"><a href="/#settings"><i class="fa falist fa-cog"></i> Settings</a></li>
+                    <li v-if="userObj"><a href="/#my-orders"><i class="fa falist fa-cubes"></i> My orders</a></li>
+                    <li v-if="userObj"><a href="/#reviews-page"><i class="fa falist fa-users"></i> My reviews</a></li>
+                    <li v-if="userObj"><a href="/#reviews-page"><i class="fa falist fa-smile-o"></i> My profile</a></li>
+                    <li v-if="userObj && userObj.isCustomer === 0"><a href="/#my-commissions"><i class="fa falist fa-pie-chart"></i> My commissions</a></li>
+                    <li v-if="userObj && userObj.id === 1"><a href="/#admin-page"><i class="fa falist fa-user-secret"></i> Admin Page</a></li>
+                    <li v-if="userObj"><a href="/#personal-area"><i class="fa falist fa-user"></i> Personal Area</a></li>
+                    <li v-if="userObj" class="divider"></li>
+                    <li v-if="userObj"><a href="/logout/"><i class="fa falist fa-power-off"></i> Logout</a></li>
+
+                    <li v-if="!userObj"><a href="/login"><i class="fa falist fa-sign-in"></i> Login</a></li>
+                    <li v-if="!userObj"><a href="/register"><i class="fa falist fa-user-plus"></i> Registration</a></li>
+                    <li v-if="userObj" class="divider"></li>
+                    <li v-if="!userObj"><a href="/forgot-password"><i class="fa falist fa-question"></i> Forgot password</a></li>
+                </ul>
+            </li>
+
+        </ul>
+        <!-- End Top Right -->
+
+    </div>
+    <!-- END TOP -->
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+
+
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+    <!-- START SIDEBAR -->
+    <div class="sidebar clearfix">
+
+        <ul class="sidebar-panel nav">
+            <li class="sidetitle">MENU</li>
+            <li><a href="/"><span class="icon color5"><i class="fa fa-home"></i></span>Home</a></li>
+            <li><a href="/#create-order"><span class="icon color6"><i class="fa fa-plus-square"></i></span>Create Order</a></li>
+            <li v-if="userObj && userObj.id === 1"><a href="/#admin-page"><span class="icon color6"><i class="fa fa-user-secret"></i></span>Admin page</a></li>
+            <li><a href="/#my-orders"><span class="icon color6"><i class="fa fa-cubes"></i></span>My Orders<span v-if="myOrdersCount !== 0"
+                            class="label label-default">{{myOrdersCount}}</span></a></li>
+            <li v-if="userObj && userObj.isCustomer === 0"><a href="/#my-commissions"><span class="icon color6"><i class="fa fa-pie-chart"></i></span>My Commissions</a></li>
+            <li><a href="/#reviews-page"><span class="icon color6"><i class="fa fa-users"></i></span>My reviews</a></li>
+            <li><a href="/#personal-area"><span class="icon color6"><i class="fa fa-user"></i></span>Personal Area</a></li>
+            <li><a href="/#profile"><span class="icon color6"><i class="fa fa-smile-o"></i></span>My profile</a></li>
+            <li><a href="/#"><span class="icon color14"><i class="fa fa-paper-plane-o"></i></span>Another Pages<span
+                            class="caret"></span></a>
+                <ul>
+                    <li><a href="/">Dashboard</a></li>
+                    <li><a href="/#blank">Blank</a></li>
+                    <li><a href="/login">Login Page</a></li>
+                    <li><a href="/#order-page/picca-picca-picca">Order #12</a></li>
+                    <li><a href="/#settings">Settings</a></li>
+                    <li><a href="/register">Register</a></li>
+                    <li><a href="/forgot-password">Forgot Password</a></li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+    <!-- END SIDEBAR -->
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+    <!-- START CONTENT -->
+    <dashboard v-if="whatPageToShow === 'main'" ref="dashboard" v-bind:user-obj="userObj" v-bind:orders="orders" v-bind:cities="cities" v-bind:my-orders="myOrders"></dashboard>
+    <create-order v-show="whatPageToShow === 'create-order'" ref="createOrder" v-bind:user-obj="userObj"></create-order>
+    <blank-page v-if="whatPageToShow === 'blank'" ref="blankPage" v-bind:user-obj="userObj"></blank-page>
+    <order-page v-if="whatPageToShow === 'order-page'" ref="orderPage" v-bind:user-obj="userObj" v-bind:one-order="oneOrder" v-bind:users-online="usersOnline"></order-page>
+    <profile v-if="whatPageToShow === 'profile'" ref="profile" v-bind:user-obj="userObj" v-bind:profile-data="profileData"  v-bind:users-online="usersOnline"></profile>
+    <settings v-show="whatPageToShow === 'settings'" ref="settings" v-bind:user-obj="userObj" v-bind:profile-data="profileData"></settings>
+    <my-orders v-show="whatPageToShow === 'my-orders'" ref="myOrders" v-bind:user-obj="userObj" v-bind:orders="myOrders" v-bind:client-token="clientToken"></my-orders>
+    <my-commissions v-show="whatPageToShow === 'my-commissions'" ref="myCommissions" v-bind:user-obj="userObj" v-bind:orders="myOrders" v-bind:client-token="clientToken"></my-commissions>
+    <personal-area v-if="whatPageToShow === 'personal-area'" ref="personalArea" v-bind:user-obj="userObj"></personal-area>
+    <admin-page v-if="whatPageToShow === 'admin-page'" ref="adminPage" v-bind:user-obj="userObj"></admin-page>
+    <reviews-page v-if="whatPageToShow === 'reviews-page'" ref="reviewsPage" v-bind:user-obj="userObj"></reviews-page>
+    <!-- End Content -->
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+
+
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+    <!-- START SIDEPANEL-->
+    <div role="tabpanel" class="sidepanel">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#today" aria-controls="today" role="tab" data-toggle="tab">TODAY</a>
+            </li>
+            <li role="presentation"><a href="#tasks" aria-controls="tasks" role="tab" data-toggle="tab">TASKS</a></li>
+            <li role="presentation"><a href="#chat" aria-controls="chat" role="tab" data-toggle="tab">CHAT</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <!-- Start Today -->
+            <div role="tabpanel" class="tab-pane active" id="today">
+
+                <div class="sidepanel-m-title">
+                    Today
+                    <span class="left-icon"><a href="#"><i class="fa fa-refresh"></i></a></span>
+                    <span class="right-icon"><a href="#"><i class="fa fa-file-o"></i></a></span>
+                </div>
+
+                <div class="gn-title">NEW</div>
+
+                <ul class="list-w-title">
+                    <li>
+                        <a href="#">
+                            <span class="label label-danger">ORDER</span>
+                            <span class="date">9 hours ago</span>
+                            <h4>New Jacket 2.0</h4>
+                            Etiam auctor porta augue sit amet facilisis. Sed libero nisi, scelerisque.
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-success">COMMENT</span>
+                            <span class="date">14 hours ago</span>
+                            <h4>Bill Jackson</h4>
+                            Etiam auctor porta augue sit amet facilisis. Sed libero nisi, scelerisque.
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-info">MEETING</span>
+                            <span class="date">at 2:30 PM</span>
+                            <h4>Developer Team</h4>
+                            Etiam auctor porta augue sit amet facilisis. Sed libero nisi, scelerisque.
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-warning">EVENT</span>
+                            <span class="date">3 days left</span>
+                            <h4>Birthday Party</h4>
+                            Etiam auctor porta augue sit amet facilisis. Sed libero nisi, scelerisque.
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+            <!-- End Today -->
+
+            <!-- Start Tasks -->
+            <div role="tabpanel" class="tab-pane" id="tasks">
+
+                <div class="sidepanel-m-title">
+                    To-do List
+                    <span class="left-icon"><a href="#"><i class="fa fa-pencil"></i></a></span>
+                    <span class="right-icon"><a href="#"><i class="fa fa-trash"></i></a></span>
+                </div>
+
+                <div class="gn-title">TODAY</div>
+
+                <ul class="todo-list">
+                    <li class="checkbox checkbox-primary">
+                        <input id="checkboxside1" type="checkbox"><label for="checkboxside1">Add new products</label>
+                    </li>
+
+                    <li class="checkbox checkbox-primary">
+                        <input id="checkboxside2" type="checkbox"><label for="checkboxside2"><b>May 12, 6:30 pm</b>
+                            Meeting with Team</label>
+                    </li>
+
+                    <li class="checkbox checkbox-warning">
+                        <input id="checkboxside3" type="checkbox"><label for="checkboxside3">Design Facebook
+                            page</label>
+                    </li>
+
+                    <li class="checkbox checkbox-info">
+                        <input id="checkboxside4" type="checkbox"><label for="checkboxside4">Send Invoice to
+                            customers</label>
+                    </li>
+
+                    <li class="checkbox checkbox-danger">
+                        <input id="checkboxside5" type="checkbox"><label for="checkboxside5">Meeting with developer
+                            team</label>
+                    </li>
+                </ul>
+
+                <div class="gn-title">TOMORROW</div>
+                <ul class="todo-list">
+                    <li class="checkbox checkbox-warning">
+                        <input id="checkboxside6" type="checkbox"><label for="checkboxside6">Redesign our company
+                            blog</label>
+                    </li>
+
+                    <li class="checkbox checkbox-success">
+                        <input id="checkboxside7" type="checkbox"><label for="checkboxside7">Finish client work</label>
+                    </li>
+
+                    <li class="checkbox checkbox-info">
+                        <input id="checkboxside8" type="checkbox"><label for="checkboxside8">Call Johnny from Developer
+                            Team</label>
+                    </li>
+
+                </ul>
+            </div>
+            <!-- End Tasks -->
+
+            <!-- Start Chat -->
+            <div role="tabpanel" class="tab-pane" id="chat">
+
+                <div class="sidepanel-m-title">
+                    Friend List
+                    <span class="left-icon"><a href="#"><i class="fa fa-pencil"></i></a></span>
+                    <span class="right-icon"><a href="#"><i class="fa fa-trash"></i></a></span>
+                </div>
+
+                <div class="gn-title">ONLINE MEMBERS (3)</div>
+                <ul class="group">
+                    <li class="member"><a href="#"><img src="/img/profileimg.png" alt="img"><b>Allice Mingham</b>Los
+                            Angeles</a><span class="status online"></span></li>
+                    <li class="member"><a href="#"><img src="/img/profileimg2.png" alt="img"><b>James Throwing</b>Las
+                            Vegas</a><span class="status busy"></span></li>
+                    <li class="member"><a href="#"><img src="/img/profileimg3.png" alt="img"><b>Fred Stonefield</b>New
+                            York</a><span class="status away"></span></li>
+                    <li class="member"><a href="#"><img src="/img/profileimg4.png" alt="img"><b>Chris M. Johnson</b>California</a><span
+                                class="status online"></span></li>
+                </ul>
+
+                <div class="gn-title">OFFLINE MEMBERS (8)</div>
+                <ul class="group">
+                    <li class="member"><a href="#"><img src="/img/profileimg5.png" alt="img"><b>Allice Mingham</b>Los
+                            Angeles</a><span class="status offline"></span></li>
+                    <li class="member"><a href="#"><img src="/img/profileimg6.png" alt="img"><b>James Throwing</b>Las
+                            Vegas</a><span class="status offline"></span></li>
+                </ul>
+
+                <form class="search">
+                    <input type="text" class="form-control" placeholder="Search a Friend...">
+                </form>
+            </div>
+            <!-- End Chat -->
+
+        </div>
+
+    </div>
+    <!-- END SIDEPANEL -->
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+</div>
+
+<%- include ('components/scripts.ejs') %>
+
+<!-- Today Sales -->
+<!--script>
+
+  // set up our data series with 50 random data points
+
+  var seriesData = [ [], [], [] ];
+  var random = new Rickshaw.Fixtures.RandomData(20);
+
+  for (var i = 0; i < 110; i++) {
+    random.addData(seriesData);
+  }
+
+  // instantiate our graph!
+
+  var graph = new Rickshaw.Graph( {
+    element: document.getElementById("todaysales"),
+    renderer: 'bar',
+    series: [
+      {
+        color: "#33577B",
+        data: seriesData[0],
+        name: 'Photodune'
+      }, {
+        color: "#77BBFF",
+        data: seriesData[1],
+        name: 'Themeforest'
+      }, {
+        color: "#C1E0FF",
+        data: seriesData[2],
+        name: 'Codecanyon'
+      }
+    ]
+  } );
+
+  graph.render();
+
+  var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+    graph: graph,
+    formatter: function(series, x, y) {
+      var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+      var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+      var content = swatch + series.name + ": " + parseInt(y) + '<br>' + date;
+      return content;
+    }
+  } );
+
+</script>
+
+
+<script>
+  // set up our data series with 50 random data points
+
+  var seriesData = [ [], [], [] ];
+  var random = new Rickshaw.Fixtures.RandomData(20);
+
+  for (var i = 0; i < 50; i++) {
+    random.addData(seriesData);
+  }
+
+  // instantiate our graph!
+
+  var graph = new Rickshaw.Graph( {
+    element: document.getElementById("todayactivity"),
+    renderer: 'area',
+    series: [
+      {
+        color: "#9A80B9",
+        data: seriesData[0],
+        name: 'London'
+      }, {
+        color: "#CDC0DC",
+        data: seriesData[1],
+        name: 'Tokyo'
+      }
+    ]
+  } );
+
+  graph.render();
+
+  var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+    graph: graph,
+    formatter: function(series, x, y) {
+      var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+      var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+      var content = swatch + series.name + ": " + parseInt(y) + '<br>' + date;
+      return content;
+    }
+  } );
+</script-->
+
+<%- include ('components/dashboard.ejs') %>
+<%- include ('components/createOrder.ejs') %>
+<%- include ('components/blankPage.ejs') %>
+<%- include ('components/orderPage.ejs') %>
+<%- include ('components/profile.ejs') %>
+<%- include ('components/settings.ejs') %>
+<%- include ('components/myOrders.ejs') %>
+<%- include ('components/myCommissions.ejs') %>
+<%- include ('components/personalArea.ejs') %>
+<%- include ('components/adminPage.ejs') %>
+<%- include ('components/reviewsPage.ejs') %>
+<script>
+    let newOrderAutocomplete, searchAutocomplete, settingsAutocomplete;
+    var componentForm = {
+        street_number: 'short_name',
+        route: 'long_name',
+        administrative_area_level_2: 'long_name',
+        country: 'long_name'
+    };
+    var componentFormSet = {
+        street_number_settings: 'short_name',
+        route_settings: 'long_name',
+        administrative_area_level_2_settings: 'long_name',
+        country_settings: 'long_name'
+    };
+    var geocoder, geocoderSet;
+    var map, mapSet;
+    var marker, markerSet;
+    var infowindow, infowindowSet;
+
+    function getAmount() {
+        return app.$refs.myOrders.paymentCount;
+    }
+
+    function setPlace(place = null) {
+        console.log(place);
+
+        if (!place || !place.address_components || !place.geometry || !place.geometry.location){
+            console.error('Error! Place is null!');
+            app.$refs.createOrder.address.level_1 =     ""
+            app.$refs.createOrder.address.level_2 =     ""
+            app.$refs.createOrder.address.city =        ""
+            app.$refs.createOrder.address.country =     ""
+            app.$refs.createOrder.address.countryCode = ""
+            app.$refs.createOrder.address.lat =         ""
+            app.$refs.createOrder.address.long =        ""
+            app.$refs.createOrder.address.route =       ""
+            app.$refs.createOrder.address.house =       ""
+            return;
+        }
+
+        for (var component in componentForm) {
+            document.getElementById(component).disabled = false;
+        }
+
+        app.$refs.createOrder.address.lat = place.geometry.location.lat();
+        app.$refs.createOrder.address.long = place.geometry.location.lng();
+        app.$refs.createOrder.address.formatAddress = place.formatted_address;
+        app.$refs.createOrder.address.cityId = null; // if the address changes, i remove the city and country id.
+        app.$refs.createOrder.address.countryId = null;
+
+        place.address_components.forEach(el => {
+            console.log(el.types[0]);
+            if (el.types[0] === "country"){
+                document.getElementById('country').disabled = true;
+                app.$refs.createOrder.address.countryCode = el.short_name;
+                app.$refs.createOrder.address.country = el.long_name;
+            }
+            if (el.types[0] === "administrative_area_level_1"){
+                app.$refs.createOrder.address.level_1 = el.short_name;
+            }
+            if (el.types[0] === "locality"){
+                document.getElementById('administrative_area_level_2').disabled = true;
+                app.$refs.createOrder.address.level_2 = el.short_name;
+                app.$refs.createOrder.address.city = el.long_name;
+            }
+            if (el.types[0] === "route"){
+                document.getElementById('route').disabled = true;
+                app.$refs.createOrder.address.route = el.short_name;
+            }
+            if (el.types[0] === "street_number"){
+                app.$refs.createOrder.address.house = el.short_name;
+            }
+        })
+
+        console.log('after place')
+
+        let city = place.address_components.find(function(el) {
+            return el.types[0] === 'locality';
+        });
+
+        if (!city){
+
+            city = place.address_components.find(function(el) {
+                return el.types[0] === 'administrative_area_level_2';
+            });
+            if (city){
+                document.getElementById('administrative_area_level_2').disabled = true;
+                app.$refs.createOrder.address.level_2 = city.short_name;
+                app.$refs.createOrder.address.city = city.long_name;
+            }
+        }
+
+        if (!city){
+            city = place.address_components.find(function(el) {
+                return el.types[0] === 'sublocality_level_1';
+            });
+            if (city){
+                document.getElementById('administrative_area_level_2').disabled = true;
+                app.$refs.createOrder.address.level_2 = city.short_name;
+                app.$refs.createOrder.address.city = city.long_name;
+            }
+        }
+
+        if (app.$refs.createOrder.ini){
+            app.$refs.createOrder.ini.setCountry(app.$refs.createOrder.address.countryCode.toLowerCase());
+        }
+        console.log('End. Now address: ', app.$refs.createOrder.address);
+    }
+
+    function setPlaceSet(place = null) {
+        console.log(place);
+
+        if (!place || !place.address_components || !place.geometry || !place.geometry.location){
+            console.error('Error! Place is null!');
+            app.$refs.settings.address.level_1 =     ""
+            app.$refs.settings.address.level_2 =     ""
+            app.$refs.settings.address.city =        ""
+            app.$refs.settings.address.country =     ""
+            app.$refs.settings.address.countryCode = ""
+            app.$refs.settings.address.lat =         ""
+            app.$refs.settings.address.long =       ""
+            app.$refs.settings.address.route =       ""
+            app.$refs.settings.address.house =       ""
+            return;
+        }
+
+        for (var component in componentFormSet) {
+            document.getElementById(component).disabled = false;
+        }
+
+        app.$refs.settings.address.lat = place.geometry.location.lat();
+        app.$refs.settings.address.long = place.geometry.location.lng();
+        app.$refs.settings.address.formatAddress = place.formatted_address;
+
+        place.address_components.forEach(el => {
+            console.log(el.types[0]);
+            if (el.types[0] === "country"){
+                document.getElementById('country_settings').disabled = true;
+                app.$refs.settings.address.countryCode = el.short_name;
+                app.$refs.settings.address.country = el.long_name;
+            }
+            if (el.types[0] === "administrative_area_level_1"){
+                app.$refs.settings.address.level_1 = el.short_name;
+            }
+            if (el.types[0] === "locality"){
+                document.getElementById('administrative_area_level_2_settings').disabled = true;
+                app.$refs.settings.address.level_2 = el.short_name;
+                app.$refs.settings.address.city = el.long_name;
+            }
+            if (el.types[0] === "route"){
+                document.getElementById('route_settings').disabled = true;
+                app.$refs.settings.address.route = el.short_name;
+            }
+            if (el.types[0] === "street_number"){
+                app.$refs.settings.address.house = el.short_name;
+            }
+        })
+
+        console.log('after place')
+
+        let city = place.address_components.find(function(el) {
+            return el.types[0] === 'locality';
+        });
+
+        if (!city){
+
+            city = place.address_components.find(function(el) {
+                return el.types[0] === 'administrative_area_level_2';
+            });
+            if (city){
+                document.getElementById('administrative_area_level_2_settings').disabled = true;
+                app.$refs.settings.address.level_2 = city.short_name;
+                app.$refs.settings.address.city = city.long_name;
+            }
+        }
+
+        if (!city){
+            city = place.address_components.find(function(el) {
+                return el.types[0] === 'sublocality_level_1';
+            });
+            if (city){
+                document.getElementById('administrative_area_level_2_settings').disabled = true;
+                app.$refs.settings.address.level_2 = city.short_name;
+                app.$refs.settings.address.city = city.long_name;
+            }
+        }
+        console.log('End. Now address: ', app.$refs.settings.address);
+    }
+
+    function showMap() {
+        $('#map-under-address').css('display', 'block');
+        var myLatlng = new google.maps.LatLng(app.$refs.createOrder.address.lat, app.$refs.createOrder.address.long);
+        var mapOptions = {
+            zoom: 17,
+            center: myLatlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            gestureHandling: 'greedy'
+        }
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        marker = new google.maps.Marker({
+            position: myLatlng,
+            map: map,
+            title: 'Hello World!',
+            draggable: true
+        });
+
+        google.maps.event.addListener(marker, 'dragend', function() {
+            geocodePosition(marker.getPosition());
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+            if (marker.formatted_address) {
+                infowindow.setContent(marker.formatted_address);
+            } else {
+                infowindow.setContent($('#location-new-order').val());
+            }
+            infowindow.open(map, marker);
+        });
+        google.maps.event.trigger(marker, 'click');
+    }
+
+    function showMapSet() {
+        $('#map-in-settings').css('display', 'block');
+        var myLatlng = new google.maps.LatLng(app.$refs.settings.address.lat, app.$refs.settings.address.long);
+        var mapOptions = {
+            zoom: 17,
+            center: myLatlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            gestureHandling: 'greedy'
+        }
+        mapSet = new google.maps.Map(document.getElementById('map-settings'), mapOptions);
+
+        markerSet = new google.maps.Marker({
+            position: myLatlng,
+            map: mapSet,
+            title: 'Hello World!',
+            draggable: true
+        });
+
+        google.maps.event.addListener(markerSet, 'dragend', function() {
+            geocodePositionSet(markerSet.getPosition());
+        });
+        google.maps.event.addListener(markerSet, 'click', function() {
+            if (markerSet.formatted_address) {
+                infowindowSet.setContent(markerSet.formatted_address);
+            } else {
+                infowindowSet.setContent($('#location-settings').val());
+            }
+            infowindowSet.open(mapSet, markerSet);
+        });
+        google.maps.event.trigger(markerSet, 'click');
+    }
+
+    function changeNewOrder(place = null) {
+        // Get the place details from the autocomplete object.
+        $('#specifyAddress').css('display', 'none');
+
+        setPlace(place);
+
+        if (document.getElementById('administrative_area_level_2').disabled === false || document.getElementById('route').disabled === false || document.getElementById('street_number').disabled === false){
+            $('#specifyAddress').css('display', 'block');
+            if (document.getElementById('administrative_area_level_2').disabled === false) {
+                var options = {
+                    types: ['(cities)'],
+                    componentRestrictions: {country: app.$refs.createOrder.address.countryCode}
+                };
+
+                var input = document.getElementById('administrative_area_level_2');
+                var autocomplete = new google.maps.places.Autocomplete(input, options);
+                autocomplete.addListener('place_changed', function () {
+                    setPlace(autocomplete.getPlace());
+                    showMap();
+                    document.getElementById('administrative_area_level_2').disabled = true;
+                    var boundsByCity = autocomplete.getPlace().geometry.viewport;
+                    var routeOptions = {
+                        bounds: boundsByCity,
+                        componentRestrictions: {country: app.$refs.createOrder.address.countryCode},
+                        types: ['address']
+                    };
+                    var routeAuto = new google.maps.places.Autocomplete(document.getElementById('route'), routeOptions);
+                    routeAuto.addListener('place_changed', function () {
+                        document.getElementById('administrative_area_level_2').disabled = true;
+                        setPlace(routeAuto.getPlace());
+                        showMap();
+                    });
+                });
+            }
+            else if (document.getElementById('route').disabled === false) {
+                document.getElementById('administrative_area_level_2').disabled = true;
+                var boundsByCity = place.geometry.viewport;
+                var routeOptions = {
+                    bounds: boundsByCity,
+                    componentRestrictions: {country: app.$refs.createOrder.address.countryCode},
+                    types: ['address']
+                };
+                var routeAuto = new google.maps.places.Autocomplete(document.getElementById('route'), routeOptions);
+                routeAuto.addListener('place_changed', function () {
+                    document.getElementById('administrative_area_level_2').disabled = true;
+                    setPlace(routeAuto.getPlace());
+                    showMap();
+                });
+            }
+        }
+
+        if (document.getElementById('administrative_area_level_2').disabled === true){
+            showMap();
+        }
+    }
+
+    function changeAddressUser(place = null) {
+        // Get the place details from the autocomplete object.
+        $('#specifyAddressSettings').css('display', 'none');
+
+        setPlaceSet(place);
+
+        if (document.getElementById('administrative_area_level_2_settings').disabled === false || document.getElementById('route_settings').disabled === false || document.getElementById('street_number_settings').disabled === false){
+            $('#specifyAddress').css('display', 'block');
+            if (document.getElementById('administrative_area_level_2_settings').disabled === false) {
+                var options = {
+                    types: ['(cities)'],
+                    componentRestrictions: {country: app.$refs.settings.address.countryCode}
+                };
+
+                var input = document.getElementById('administrative_area_level_2_settings');
+                var autocomplete = new google.maps.places.Autocomplete(input, options);
+                autocomplete.addListener('place_changed', function () {
+                    setPlaceSet(autocomplete.getPlace());
+                    showMapSet();
+                    document.getElementById('administrative_area_level_2_settings').disabled = true;
+                    var boundsByCity = autocomplete.getPlace().geometry.viewport;
+                    var routeOptions = {
+                        bounds: boundsByCity,
+                        componentRestrictions: {country: app.$refs.settings.address.countryCode},
+                        types: ['address']
+                    };
+                    var routeAuto = new google.maps.places.Autocomplete(document.getElementById('route_settings'), routeOptions);
+                    routeAuto.addListener('place_changed', function () {
+                        document.getElementById('administrative_area_level_2_settings').disabled = true;
+                        setPlaceSet(routeAuto.getPlace());
+                        showMapSet();
+                    });
+                });
+            }
+            else if (document.getElementById('route_settings').disabled === false) {
+                document.getElementById('administrative_area_level_2_settings').disabled = true;
+                var boundsByCity = place.geometry.viewport;
+                var routeOptions = {
+                    bounds: boundsByCity,
+                    componentRestrictions: {country: app.$refs.settings.address.countryCode},
+                    types: ['address']
+                };
+                var routeAuto = new google.maps.places.Autocomplete(document.getElementById('route_settings'), routeOptions);
+                routeAuto.addListener('place_changed', function () {
+                    document.getElementById('administrative_area_level_2_settings').disabled = true;
+                    setPlaceSet(routeAuto.getPlace());
+                    showMapSet();
+                });
+            }
+        }
+
+        if (document.getElementById('administrative_area_level_2_settings').disabled === true){
+            showMapSet();
+        }
+    }
+
+    function geocodePosition(pos) {
+        console.log('geocode now')
+        geocoder.geocode({
+            latLng: pos
+        }, function(responses) {
+            if (responses && responses.length > 0) {
+                $('#specifyAddress').css('display', 'none');
+                $('#location-new-order').val(responses[0].formatted_address);
+                marker.formatted_address = responses[0].formatted_address;
+                setPlace(responses[0]);
+            } else {
+                marker.formatted_address = 'Cannot determine address at this location.';
+            }
+            infowindow.setContent(marker.formatted_address);
+            infowindow.open(map, marker);
+        });
+    }
+
+    function geocodePositionSet(pos) {
+        console.log('geocode now')
+        geocoder.geocode({
+            latLng: pos
+        }, function(responses) {
+            if (responses && responses.length > 0) {
+                $('#specifyAddressSettings').css('display', 'none');
+                $('#location-settings').val(responses[0].formatted_address);
+                markerSet.formatted_address = responses[0].formatted_address;
+                setPlaceSet(responses[0]);
+            } else {
+                markerSet.formatted_address = 'Cannot determine address at this location.';
+            }
+            infowindowSet.setContent(markerSet.formatted_address);
+            infowindowSet.open(mapSet, markerSet);
+        });
+    }
+
+    function initAutocomplete() {
+        let searchInput = document.getElementById('searchbox');
+        if (searchInput) {
+            searchAutocomplete = new google.maps.places.Autocomplete(searchInput);
+            searchAutocomplete.addListener('place_changed', function () {
+                var place = searchAutocomplete.getPlace();
+                socket.emit('findOrdersByRadius', {lat: place.geometry.location.lat(), long: place.geometry.location.lng()}, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error');
+                    } else {
+                        app.orders = answer;
+                        if (app.whatPageToShow !== 'main') app.goToPage('main');
+                    }
+                });
+            });
+        }
+
+        let locationNewOrder = document.getElementById('location-new-order');
+        if (locationNewOrder) {
+            newOrderAutocomplete = new google.maps.places.Autocomplete(locationNewOrder);
+            newOrderAutocomplete.addListener('place_changed', () => changeNewOrder(newOrderAutocomplete.getPlace()));
+            infowindow = new google.maps.InfoWindow({
+                size: new google.maps.Size(150, 50)
+            });
+            geocoder = new google.maps.Geocoder();
+        }
+
+        if (app.userObj && app.userObj.lat && app.userObj.longg){
+            locationNewOrder.value = app.userObj.address;
+            showMap();
+        }
+
+        let locationSettings = document.getElementById('location-settings');
+        if (locationSettings) {
+            settingsAutocomplete = new google.maps.places.Autocomplete(locationSettings);
+            settingsAutocomplete.addListener('place_changed', () => changeAddressUser(settingsAutocomplete.getPlace()));
+            infowindowSet = new google.maps.InfoWindow({
+                size: new google.maps.Size(150, 50)
+            });
+            geocoderSet = new google.maps.Geocoder();
+        }
+
+        if (app.userObj && app.userObj.lat && app.userObj.longg){
+            locationSettings.value = app.userObj.address;
+            app.$refs.settings.address.lat = app.userObj.lat;
+            app.$refs.settings.address.long = app.userObj.longg;
+            showMapSet();
+        }
+    }
+</script>
+
+<script>
+    Vue.use(SocialSharing)
+    var app = new Vue({
+        el: '#wrapper',
+        data: {
+            pages: ['main'], // initial
+            clientToken: null,
+            userObj: {id: '1', userName: 'Alice', email: 'mail@mail.ru', password:'1234', isCustomer: '0', date_register: '12/02/10', },
+            orders: [{
+                title: '1234567',
+                description: 'it is decrip[tion',
+                userId: '1',
+                payment: '199',
+                address: 'it is here!',
+                lat: '',
+                longg: '',
+                slug: 'picca-picca-picca',
+                shippingFee: 'he he',
+                coastOfGoods: 'cat',
+                countryId: '',
+                cityId: '',
+                datePost: '1 janyary',
+                phoneNumber: '790433333',
+                currency: 'rub',
+                apartaments: '010',
+                closeOrder: '0',
+                completedOrder: '1',
+                contractorId: '1',
+                avatarPath: '',
+                name: 'Alice',
+                likes: '3',
+                dislikes: '1',
+                review: {
+                    rating: 1
+                },
+                answers: [
+                    {id: 12, userId:1, name: 'Bob', answerText: 'it is cool!', likeCount: 5,
+                    comments: [{
+                        userId: 2,
+                        name: 'Tom',
+                        commentText: 'Absolutly!'
+                    }]}
+                ]
+            }],//<%- JSON.stringify(locals.orders) %>,
+            cities: <%- JSON.stringify(locals.cities) %>,
+            profileData: {},
+            oneOrder: {},
+            usersOnline: {},
+            payPalOrders: null,
+            payPalCommis: null,
+        },
+        computed: {
+            whatPageToShow: function () {
+                // get last page from "history"
+                let howMuch = this.pages.length;
+                howMuch = howMuch - 1;
+                if (howMuch < 0) {
+                    console.log('Error in whatPageToShow');
+                    return 'main';
+                }
+                // return last page name
+                return this.pages[howMuch];
+                console.log(whatPageToShow);
+            },
+            myOrders: function () {
+                if (!this.userObj || !this.orders) return null;
+                var arr = [];
+                this.orders.forEach(order => {
+                    if (this.userObj && (order.contractorId === this.userObj.id || order.userId === this.userObj.id)){
+                        arr.push(order);
+                    }
+                })
+                return arr;
+            },
+            myOrdersCount: function () {
+                if (!this.userObj || !this.orders) return null;
+                var arr = [];
+                this.orders.forEach(order => {
+                    if (order.closeOrder !== 1 && order.completedOrder !== 1){
+                        if (this.userObj && (order.contractorId === this.userObj.id || order.userId === this.userObj.id)){
+                            arr.push(order);
+                        }
+                    }
+                })
+                return arr.length;
+            }
+        },
+        created: function () {
+            let firstHash = window.location.hash;
+            if (firstHash && typeof firstHash === 'string' && firstHash.includes('#') && firstHash.length > 1) {
+                firstHash = firstHash.replace('#', '');
+                this.goToPage(firstHash);
+            }
+
+            if (this.userObj){
+                socket.emit('login', {userId: this.userObj.id});
+            }
+
+                // ** ROUTER INDEX EJS *//
+            window.onhashchange = () => { // super small router :)
+                if (window.innerDocClick) {
+                    // Your own in-page mechanism triggered the hash change
+                    console.log('Your own in-page mechanism triggered the hash change')
+                } else {
+                    // Browser back or forward button was pressed
+                    let firstHash = window.location.hash;
+                    let tempUrl = `${window.location}`
+
+                    if (firstHash && typeof firstHash === 'string' && firstHash.includes('#') && firstHash.length > 1) {
+                        firstHash = firstHash.replace('#', '');
+                        this.goToPage(firstHash);
+                    } else if (tempUrl.includes('#') === false) {
+                        this.goToPage('main')
+                        $('.panel-tools .expand-tool').on('click', function(){
+                            if($(this).parents(".panel").hasClass('panel-fullsize'))
+                            {
+                                $(this).parents(".panel").removeClass('panel-fullsize');
+                            }
+                            else
+                            {
+                                $(this).parents(".panel").addClass('panel-fullsize');
+
+                            }
+                        });
+                    }
+                }
+            };
+
+        },
+        methods: {
+            initTippy: function () {
+                tippy('.order-wait-icon', {
+                    content: "The order is reserved. The contractor of the order has been found, but he has not yet completed the order or the customer has not yet marked the order completed.",
+                    duration: 0
+                });
+
+                tippy('.order-open-icon', {
+                    content: "The order is open. The contractor has not yet been found.",
+                    duration: 0
+                });
+
+                tippy('.order-close-icon', {
+                    content: "Order closed. Customer canceled the order.",
+                    duration: 0
+                });
+
+                tippy('.order-performed-icon', {
+                    content: "Order completed. The contractor completed the order and the customer marked the order as completed.",
+                    duration: 0
+                });
+
+                tippy('#apartaments', {
+                    content: "It is entered if it is not a private house. You can enter the room number if it is a hostel.",
+                    duration: 0
+                });
+
+                tippy('#cityTippy', {
+                    content: "To select a city, use only the values ​​from the drop-down list of cities. Start typing your city and you will see a drop-down list.",
+                    duration: 0
+                });
+
+                tippy('#paypal-faster', {
+                    content: "Transactions through paypal are faster and more reliable.",
+                    duration: 0
+                });
+
+
+            },
+            goToPage: function (value) {
+                console.log('go to ', value);
+                /** PARAMETERS ROUTER */
+                // may be some parameters?
+                if (value.includes("/")) {
+                    // get first parameter after /
+                    var parameterArr = value.split('/')
+                    console.log(parameterArr[0]);
+
+                    if (parameterArr[0] === 'order-page') {   // apply offer page
+                        // load offer detail
+                        for(var i = 0; i < this.orders.length; i++){
+                            if (this.orders[i].slug.toString() === parameterArr[1]){
+                                this.oneOrder = this.orders[i];
+                                console.log(this.oneOrder);
+                            }
+                        }
+                    } else if (parameterArr[0] === 'profile') {   // specific deal page
+                        socket.emit('getProfileById', parameterArr[1], function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                console.log('return!');
+                                app.profileData = answer;
+                            }
+                        });
+                    }
+
+                    this.pages.push(parameterArr[0]);
+                } else {
+                    console.log('not / find')
+                    if (value === 'profile' || value === 'settings'){
+                        if (this.userObj) {
+                            console.log('getMyProfile');
+                            socket.emit('getProfileById', this.userObj.id, function (error, answer) {
+                                if (error) {
+                                    swal('Error', error, 'error');
+                                } else {
+                                    console.log('return!');
+                                    app.profileData = answer;
+                                }
+                            });
+                        } else {
+                            console.log('userObj is null')
+                            this.profileData = null;
+                        }
+                    }
+                    else if (value === 'my-commissions'){
+                        if (this.clientToken === null){
+                            socket.emit('generateClientToken', null, function (error, answer) {
+                                if (error){
+                                    console.log('clientTokenGenerate Error: ', error, 'error');
+                                }
+                                else if (app.payPalCommis === null) {
+                                    app.clientToken = answer;
+                                    app.payPalCommis = paypal.Buttons({
+                                        client: {
+                                            sandbox: app.clientToken,
+                                            production: app.clientToken,
+                                        },
+                                        env: '<%-locals.payPalEnv%>', // Or 'production'
+
+                                        style: {
+                                            color:  'blue',
+                                            shape:  'pill',
+                                            label:  'pay',
+                                            height: 40
+                                        },
+
+                                        commit: true, // This will add the transaction amount to the PayPal button
+
+                                        //// Set up the transaction
+                                        createOrder: function(data, actions) {
+                                            console.log('hello!');
+                                            if (getAmount() > 0){
+                                                return actions.order.create({
+                                                    purchase_units: [{
+                                                        amount: {
+                                                            currency_code: "<%-locals.payPalCurrency%>",
+                                                            value: getAmount()
+                                                        }
+                                                    }]
+                                                });
+                                            }
+                                        },
+
+                                        // Finalize the transaction
+                                        onApprove: function(data, actions) {
+                                            return actions.order.capture().then(function(details) {
+                                                // Show a success message to the buyer
+                                                console.log('onApprove');
+                                                console.log(JSON.stringify(details));
+                                                socket.emit('transactionCreate', {transId: details.id, ordersId: app.$refs.myOrders.selectedOrderArr}, function (error, answer) {
+                                                    if (error){
+                                                        swal('Error', error, 'error');
+                                                    } else {
+                                                        swal('Transaction completed by ' + details.payer.name.given_name, 'Data will be updated soon.', 'success');
+                                                    }
+                                                });
+                                            });
+                                        },
+                                    }).render('#all-paypal-button-container');
+                                }
+                            });
+                        } else if (this.payPalCommis === null) {
+                            this.payPalCommis = paypal.Buttons({
+                                client: {
+                                    sandbox: app.clientToken,
+                                    production: app.clientToken,
+                                },
+                                env: '<%-locals.payPalEnv%>', // Or 'production'
+
+                                style: {
+                                    color:  'blue',
+                                    shape:  'pill',
+                                    label:  'pay',
+                                    height: 40
+                                },
+
+                                commit: true, // This will add the transaction amount to the PayPal button
+
+                                //// Set up the transaction
+                                createOrder: function(data, actions) {
+                                    console.log('hello!');
+                                    if (getAmount() > 0){
+                                        return actions.order.create({
+                                            purchase_units: [{
+                                                amount: {
+                                                    currency_code: "<%-locals.payPalCurrency%>",
+                                                    value: getAmount()
+                                                }
+                                            }]
+                                        });
+                                    }
+                                },
+
+                                // Finalize the transaction
+                                onApprove: function(data, actions) {
+                                    return actions.order.capture().then(function(details) {
+                                        // Show a success message to the buyer
+                                        console.log('onApprove');
+                                        console.log(JSON.stringify(details));
+                                        socket.emit('transactionCreate', {transId: details.id, ordersId: app.$refs.myOrders.selectedOrderArr}, function (error, answer) {
+                                            if (error){
+                                                swal('Error', error, 'error');
+                                            } else {
+                                                swal('Transaction completed by ' + details.payer.name.given_name, 'Data will be updated soon.', 'success');
+                                            }
+                                        });
+                                    });
+                                },
+                            }).render('#all-paypal-button-container');
+                        }
+                    }
+                    else if (value === 'my-orders'){
+                        if (this.clientToken === null){
+                            socket.emit('generateClientToken', null, function (error, answer) {
+                                if (error){
+                                    console.log('clientTokenGenerate Error: ', error, 'error');
+                                }
+                                else if (app.payPalOrders === null){
+                                    app.clientToken = answer;
+                                    app.payPalOrders = paypal.Buttons({
+                                        client: {
+                                            sandbox: app.clientToken,
+                                            production: app.clientToken,
+                                        },
+                                        env: '<%-locals.payPalEnv%>', // Or 'production'
+
+                                        style: {
+                                            color:  'blue',
+                                            shape:  'pill',
+                                            label:  'pay',
+                                            height: 40
+                                        },
+
+                                        commit: true, // This will add the transaction amount to the PayPal button
+
+                                        //// Set up the transaction
+                                        createOrder: function(data, actions) {
+                                            console.log('hello!');
+                                            if (getAmount() > 0){
+                                                return actions.order.create({
+                                                    purchase_units: [{
+                                                        amount: {
+                                                            currency_code: "<%-locals.payPalCurrency%>",
+                                                            value: getAmount()
+                                                        }
+                                                    }]
+                                                });
+                                            }
+                                        },
+
+                                        // Finalize the transaction
+                                        onApprove: function(data, actions) {
+                                            return actions.order.capture().then(function(details) {
+                                                // Show a success message to the buyer
+                                                console.log('onApprove');
+                                                console.log(JSON.stringify(details));
+                                                socket.emit('transactionCreate', {transId: details.id, ordersId: app.$refs.myOrders.selectedOrderArr}, function (error, answer) {
+                                                    if (error){
+                                                        swal('Error', error, 'error');
+                                                    } else {
+                                                        swal('Transaction completed by ' + details.payer.name.given_name, 'Data will be updated soon.', 'success');
+                                                    }
+                                                });
+                                            });
+                                        },
+                                    }).render('#paypal-button-container');
+                                    $('#payment-panel').hide();
+                                }
+                            });
+                        } else if (this.payPalOrders === null){
+                            this.payPalOrders = paypal.Buttons({
+                                client: {
+                                    sandbox: app.clientToken,
+                                    production: app.clientToken,
+                                },
+                                env: '<%-locals.payPalEnv%>', // Or 'production'
+
+                                style: {
+                                    color:  'blue',
+                                    shape:  'pill',
+                                    label:  'pay',
+                                    height: 40
+                                },
+
+                                commit: true, // This will add the transaction amount to the PayPal button
+
+                                //// Set up the transaction
+                                createOrder: function(data, actions) {
+                                    console.log('hello!');
+                                    if (getAmount() > 0){
+                                        return actions.order.create({
+                                            purchase_units: [{
+                                                amount: {
+                                                    currency_code: "<%-locals.payPalCurrency%>",
+                                                    value: getAmount()
+                                                }
+                                            }]
+                                        });
+                                    }
+                                },
+
+                                // Finalize the transaction
+                                onApprove: function(data, actions) {
+                                    return actions.order.capture().then(function(details) {
+                                        // Show a success message to the buyer
+                                        console.log('onApprove');
+                                        console.log(JSON.stringify(details));
+                                        socket.emit('transactionCreate', {transId: details.id, ordersId: app.$refs.myOrders.selectedOrderArr}, function (error, answer) {
+                                            if (error){
+                                                swal('Error', error, 'error');
+                                            } else {
+                                                swal('Transaction completed by ' + details.payer.name.given_name, 'Data will be updated soon.', 'success');
+                                            }
+                                        });
+                                    });
+                                },
+                            }).render('#paypal-button-container');
+                            $('#payment-panel').hide();
+                        }
+                    }
+                    this.pages.push(value);
+                }
+                window.scrollTo(0, 0);
+            },
+            initGoogleAutocomplete() {
+                let addr = 'https://maps.googleapis.com/maps/api/js?key='+ '<%=locals.mapsGoogleApiKey%>' + '&libraries=places&callback=initAutocomplete';
+                this.googleAutocomplete = document.createElement('script')
+                this.googleAutocomplete.setAttribute('src', addr)
+                this.googleAutocomplete.async = true
+                this.googleAutocomplete.defer = true
+                document.head.appendChild(this.googleAutocomplete)
+            },
+            searchInCity: function (cityId) {
+                var arr = [];
+                this.orders = <%- JSON.stringify(locals.orders) %>;
+                this.orders.forEach(order => {
+                    console.log(order.cityId, '=', cityId)
+                    if (order.cityId === cityId){
+                        arr.push(order);
+                        console.log('find!');
+                    }
+                });
+                if (arr.length > 0){
+                    this.orders = arr;
+                }
+                console.log(arr);
+            },
+        },
+        mounted() {
+            this.initGoogleAutocomplete();
+            this.initTippy();
+
+            socket.on('usersOnline', function (users){
+                app.usersOnline = users;
+                console.log(users)
+            });
+            console.log(this.userObj)
+        }
+    });
+
+    var tooltipSpan = document.getElementById('tooltip-span');
+</script>
+</body>
+</html>

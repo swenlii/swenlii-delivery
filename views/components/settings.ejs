@@ -1,0 +1,255 @@
+<script type="text/javascript">
+    Vue.component('settings', {
+        name: 'settings',
+        props: ['userObj', 'profileData'],
+        template: `<%- include ('settings.vue') %>`,
+        data: function () {
+            return {
+                fullName: this.userObj ? this.userObj.name : '',
+                email: this.userObj ? this.userObj.email : '',
+                aboutMe: this.userObj ? this.userObj.aboutMe : '',
+                avatarFile: null,
+                backgroundFile: null,
+                paidType: this.userObj ? this.userObj.paymentType : '',
+                paidInfo: this.userObj ? this.userObj.paymentInfo : '',
+                changeAddress: '1',
+                apartments: '',
+                address: {
+                    formatAddress: '',
+                    country:'',
+                    countryCode:'',
+                    level_1:'',
+                    level_2:'',
+                    city: '',
+                    lat:'',
+                    long:'',
+                    route:'',
+                    house:''
+                },
+            }
+        },
+        mounted () {
+            $("#paid-type").change(function(){
+                app.$refs.settings.paidType = $("#paid-type").val();
+            }.bind(this));
+
+            if (this.paidType){
+                $("#paid-type").val(this.paidType).selectpicker('refresh');
+            }
+
+            $('.selectpicker').selectpicker();
+
+            if (this.userObj && this.userObj.cityId && this.userObj.countryId){
+                this.address.lat = this.userObj.lat;
+                this.address.long = this.userObj.longg;
+                this.address.countryId = this.userObj.countryId;
+                this.address.cityId = this.userObj.cityId;
+                this.address.formatAddress = this.userObj.address;
+                this.apartments = this.userObj.apartments;
+            }
+        },
+        methods: {
+            deleteAccount: function() {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Your account will be permanently deleted.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#399bff',
+                    cancelButtonColor: '#ef4836',
+                    confirmButtonText: 'Yes, delete my account'
+                }).then((result) => {
+                    if (result.value) {
+                        socket.emit('deleteAccount', this.userObj.id, function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                swal({
+                                    title: 'Success',
+                                    type: 'success',
+                                    text: '',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(res => {
+                                    window.location.href = '/logout/';
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            changeBackground: function() {
+                var file = $('#change-background').prop('files')[0];
+                console.log('change back');
+                this.avatarFile = {
+                    type: file.type.split('/')[1],
+                    FILE: file,
+                    name: file.name
+                }
+                socket.emit('changeBackground', {id: this.userObj.id, file: this.avatarFile}, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error');
+                    } else {
+                        app.userObj.backgroudProfilePath = `${app.userObj.id}.${file.type.split('/')[1]}`;
+                        $('.for-change-background').css('background', 'url(\'/img/background.jpg\')').css('background', 'url(' + ('/img/backgroundsProfile/' + app.userObj.backgroudProfilePath) + ')');
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            },
+            changeAvatar: function() {
+                var file = $('#avatar-change').prop('files')[0];
+                console.log('change avatar');
+                this.backgroundFile = {
+                    type: file.type.split('/')[1],
+                    FILE: file,
+                    name: file.name
+                }
+                socket.emit('changeAvatar', {id: this.userObj.id, file: this.backgroundFile}, function (error, callback) {
+                    if (error){
+                        swal('Error', error, 'error');
+                    } else {
+                        app.userObj.avatarPath = `${app.userObj.id}.${file.type.split('/')[1]}`;
+                        $('#avatar-in-settings').removeAttr("src").attr("src",'/img/users/' + app.userObj.avatarPath);
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            },
+            saveChanges(event) {
+                if (event) event.preventDefault();
+                var obj = {
+                    userId: this.userObj.id,
+                    name: this.fullName,
+                    email: this.email,
+                    paymentType: this.paidType,
+                    paymentInfo: this.paidInfo,
+                    apartments: this.apartments,
+                }
+                if (obj.name.length < 4 || obj.email.length < 4 || !obj.email.includes('@') || !obj.email.includes('.')){
+                    return
+                }
+                console.log('message post');
+                socket.emit('saveProfileChanges', obj, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error');
+                    } else {
+                        Cookies.set('username', obj.name, {secure: false});
+                        console.log(Cookies.get('username'));
+                        app.userObj.name = obj.name;
+                        app.userObj.email = obj.email;
+                        app.userObj.paymentType = obj.paymentType;
+                        app.userObj.paymentInfo = obj.paymentInfo;
+                        app.userObj.apartments = obj.apartments;
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            },
+            changePassword(event) {
+                if (event) event.preventDefault();
+                var obj = {
+                    userId: this.userObj.id,
+                    oldPassword: $('#oldPassword').val(),
+                    newPassword: $('#newPassword').val(),
+                    repeatPassword: $('#repeatPassword').val()
+                }
+                if (obj.oldPassword.length < 6 || obj.newPassword.length < 6 || obj.repeatPassword.length < 6){
+                    return
+                }
+                if (obj.newPassword !== obj.repeatPassword){
+                    swal('Error', 'Your passwords do not match', 'error');
+                }
+                if (obj.oldPassword === obj.newPassword){
+                    swal('Error', 'Your old and new passwords match', 'error');
+                }
+                console.log('message post');
+                socket.emit('changePassword', obj, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error');
+                    } else {
+                        Cookies.set('password', obj.newPassword, {secure: false});
+                        console.log(Cookies.get('password'));
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                    }
+                });
+            },
+            changeAddressClick () {
+                this.changeAddress = null;
+            },
+            saveAddress () {
+                if (event) event.preventDefault();
+                var obj = {};
+                if (this.address.lat.length === 0 || this.address.long.length === 0){
+                    swal('You have not entered a address', 'To select a city, use the values ​​from the drop-down list. Start typing your city and you will see a drop-down list.', 'error');
+                    return
+                }
+                if (this.address.country.length === 0){
+                    swal('You have not entered a country', '', 'error');
+                    return
+                }
+                if (this.address.level_2.length === 0){
+                    swal('You have not entered a city', '', 'error');
+                    return
+                }
+                if (this.address.route.length === 0){
+                    swal('You have not entered a street', '', 'error');
+                    return
+                }
+                if (this.address.house.length === 0){
+                    swal('You have not entered a house number', '', 'error');
+                    return
+                }
+
+                obj.address = this.address.formatAddress;
+                obj.countryCode = this.address.countryCode;
+                obj.countryName = this.address.country;
+                obj.city = this.address.city;
+                obj.lat = this.address.lat;
+                obj.long = this.address.long;
+                obj.userId = this.userObj.id;
+
+                socket.emit('changeAddressUser', obj, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error')
+                    } else {
+                        app.userObj.lat = obj.lat;
+                        app.userObj.longg = obj.long;
+                        app.userObj.cityId = answer.cityId;
+                        app.userObj.countryId = answer.countryId;
+                        app.userObj.address = obj.address;
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            }
+        }
+    });
+</script>

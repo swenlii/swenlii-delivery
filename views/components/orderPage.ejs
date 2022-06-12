@@ -1,0 +1,347 @@
+<script type="text/javascript">
+    Vue.component('order-page', {
+        name: 'orderPage',
+        props: ['userObj', 'oneOrder', 'usersOnline'],
+        template: `<%- include ('orderPage.vue') %>`,
+        data: function () {
+            return {
+                
+            }
+        },
+        mounted() {
+            if (this.oneOrder && this.oneOrder.contractorId){
+                tippy('.selectedContractor', {
+                    content: "This user is selected to fulfill this order",
+                    duration: 0
+                });
+            }
+        },
+        methods: {
+            showFormPostAnswer: function () {
+                if (!this.oneOrder) return;
+                var ret = true;
+                // Если нет исполнителя, вопрос не закрыт и не завершен, и ты не создатель вопроса
+                if (!this.oneOrder.contractorId && this.oneOrder.closeOrder === 0 && this.oneOrder.completedOrder === 0 && this.userObj && this.userObj.id !== this.oneOrder.userId){
+                    for(var i = 0; i < this.oneOrder.answers.length; i++){
+                        if (this.userObj.id === this.oneOrder.answers[i].userId){
+                            ret = false;
+                        }
+                    }
+                } else {
+                    ret = false;
+                }
+                return ret;
+            },
+            repeatPasswordSuccess: function (){
+                if ($('#new-password2').val().toString().length > 0 && $('#new-password2').val().toString() === $('#new-repeat-password2').val().toString()){
+                    $('#new-password2').css('border-color', '#26a65b');
+                    $('#new-repeat-password2').css('border-color', '#26a65b');
+                } else {
+                    $('#new-password2').css('border-color', '#BDC4C9');
+                    $('#new-repeat-password2').css('border-color', '#BDC4C9');
+                }
+            },
+            likeClick: function (answerId, answerLikes) {
+                if (this.userObj && !answerLikes.includes(this.userObj.id)){
+                    if (answerLikes !== '') {
+                        answerLikes += '/' + answerId;
+                        for (var i = 0; i < app.oneOrder.answers.length; i++){
+                            if (app.oneOrder.answers[i].id === answerId){
+                                app.oneOrder.answers[i].likeCount += '/' + answerId;
+                            }
+                        }
+                    } else {
+                        answerLikes += answerId;
+                        for (var i = 0; i < app.oneOrder.answers.length; i++){
+                            if (app.oneOrder.answers[i].id === answerId){
+                                app.oneOrder.answers[i].likeCount += answerId;
+                            }
+                        }
+                    }
+
+                    socket.emit('likeClick', {answerId: answerId, myId: this.userObj.id}, function (error, answer) {
+                        if (error){
+                            swal('Error', error, 'error');
+                        } else {
+                            console.log('like save');
+                        }
+                    });
+                } else {
+                    console.log('like is not like!')
+                }
+            },
+            selectContractor: function (userId) {
+                if (!this.oneOrder) return;
+                socket.emit('selectContractor', {userId: userId, orderId: this.oneOrder.id, myId: this.userObj.id}, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error');
+                    } else {
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(res => {
+                            window.location.reload()
+                        });
+                    }
+                });
+            },
+            postAnswer: function (event) {
+                if (event) event.preventDefault();
+                if (!this.oneOrder) return;
+                socket.emit('postAnswer', {userId: this.userObj.id, orderId: this.oneOrder.id, text: $('#answerText').val()}, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error');
+                    } else {
+                        app.oneOrder.answers.unshift(answer);
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            },
+            postComment: function (event, answerId){
+                console.log('post coment start!')
+                if (!app.userObj){
+                    console.log('not found your userObj')
+                    return
+                }
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                console.log('keycode ' + keycode)
+                if (keycode === 13){
+                    var text = $('#comment' + answerId).val();
+                    console.log('text ' + text);
+                    if (text && text.length > 0){
+                        console.log('id' + answerId);
+                        console.log(app.userObj.id);
+                        socket.emit('postComment', {answerId: answerId, userId: app.userObj.id, text: $('#comment' + answerId).val()}, function (error, answer) {
+                            if (error){
+                                swal('Error', error, 'error');
+                            } else {
+                                for (var i = 0; i < app.oneOrder.answers.length; i++){
+                                    if (app.oneOrder.answers[i].id === answer.answerId){
+                                        if (!app.oneOrder.answers[i].comments){
+                                            app.oneOrder.answers[i].comments = [];
+                                        }
+                                        app.oneOrder.answers[i].comments.push(answer);
+                                        console.log(app.oneOrder.answers[i]);
+                                    }
+                                }
+                                swal({
+                                    title: 'Success',
+                                    type: 'success',
+                                    text: '',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                        });
+                    }
+                }
+            },
+            closeOrderClick: function () {
+                if (!this.oneOrder) return;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#399bff',
+                    cancelButtonColor: '#ef4836',
+                    confirmButtonText: 'Yes, cancel the order'
+                }).then((result) => {
+                    if (result.value) {
+                        socket.emit('closeOrder', this.oneOrder.id, function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                swal({
+                                    title: 'Success',
+                                    type: 'success',
+                                    text: '',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(res => {
+                                    app.oneOrder.closeOrder = 1;
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            loginSubmit: function (event) {
+                if (event) event.preventDefault();
+                else return;
+
+                console.log('hello!')
+                var obj = {
+                    userName: document.getElementById('old-username').value,
+                    password: document.getElementById('old-password').value,
+                }
+                socket.emit('login-user', obj, function (error, answer) {
+                    if (error) {
+                        swal('Error', error, 'error');
+                    } else {
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        Cookies.set('username', obj.userName, {secure: false});
+                        Cookies.set('password', obj.password, {secure: false});
+                        app.userObj = answer;
+                        $('#byIdClick').click();
+                        $('#newUserClick').removeClass('active');
+                        $('#oldUserClick').removeClass('active');
+                        $('#new-registration').removeClass('active');
+                        $('#already-registered').removeClass('active');
+                        //$('#byIdClick').addClass('active');
+                        //$('#logged-in').addClass('active');
+                    }
+                });
+            },
+            registrationSubmit: function (event) {
+                if (event) event.preventDefault();
+                else return
+                var obj = {
+                    isCustomers: 0,
+                    userName: $('#new-username2').val(),
+                    email: $('#new-email2').val(),
+                    password: $('#new-password2').val(),
+                    repeatPass: $('#new-repeat-password2').val(),
+                    regWithoutAddress: '1'
+                }
+                if (!obj.email || !obj.userName || !obj.password){
+                    swal('Error', 'Not enough data!', 'error');
+                    console.log(obj);
+                    return
+                }
+                if (obj.password !== obj.repeatPass) {
+                    swal('Error', 'Passwords do not match!', 'error');
+                    return
+                }
+                obj.refId = Cookies.get('refid');
+                socket.emit('register-user', obj, function (error, answer) {
+                    if (error) {
+                        swal('Error', error, 'error');
+                    } else {
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        Cookies.set('username', obj.userName, {secure: false});
+                        Cookies.set('password', obj.password, {secure: false});
+                        app.userObj = answer;
+                        $('#byIdClick').click();
+                        $('#newUserClick').removeClass('active');
+                        $('#oldUserClick').removeClass('active');
+                        $('#new-registration').removeClass('active');
+                        $('#already-registered').removeClass('active');
+                        $('#byIdClick').addClass('active');
+                        $('#logged-in').addClass('active');
+                    }
+                });
+            },
+            performedOrder: function () {
+                var rating;
+                if (!this.oneOrder) return;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'success',
+                    showCancelButton: true,
+                    confirmButtonColor: '#399bff',
+                    cancelButtonColor: '#ef4836',
+                    confirmButtonText: 'Yes, order completed'
+                }).then((result) => {
+                    if (result.value) {
+                        socket.emit('performedOrder', this.oneOrder.id, function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                app.oneOrder.completedOrder = 1;
+                                swal({
+                                    title: 'Order completed.',
+                                    text: "It remains to write a review. Want to write a review now?",
+                                    type: 'success',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#399bff',
+                                    cancelButtonColor: '#ef4836',
+                                    confirmButtonText: 'Write a review'
+                                }).then(res => {
+                                    if (res.value){
+                                        Swal.fire({
+                                            title: 'Select rating for review №',
+                                            showCloseButton: true,
+                                            showCancelButton: true,
+                                            focusConfirm: false,
+                                            cancelButtonColor: '#d33',
+                                            confirmButtonText:
+                                                '<i class="fa fa-thumbs-up"></i> I like it!',
+                                            cancelButtonText:
+                                                '<i class="fa fa-thumbs-down"></i> Everything was bad!',
+                                        }).then((res) => {
+                                            if (res.dismiss !== 'close'){
+                                                if (res.dismiss === 'cancel'){
+                                                    rating = '-1';
+                                                } else if (res.value === true){
+                                                    rating = '1'
+                                                }
+                                                Swal.fire({
+                                                    input: 'textarea',
+                                                    inputPlaceholder: 'Type your text here...',
+                                                    inputAttributes: {
+                                                        'aria-label': 'Type your text here'
+                                                    },
+                                                    showCancelButton: true,
+                                                    inputValidator: (value) => {
+                                                        if (!value) {
+                                                            return 'You need to write something!'
+                                                        }
+                                                    }
+                                                }).then((res) => {
+                                                    var obj = {
+                                                        orderId: app.oneOrder.id,
+                                                        toUserId: app.oneOrder.contractorId,
+                                                        fromUserId: app.userObj.id,
+                                                        text: res.value,
+                                                        raiting: rating,
+                                                    }
+                                                    console.log(obj);
+                                                    socket.emit('postReview', obj, function (error, answer) {
+                                                        if (error){
+                                                            swal('Error', error, 'error')
+                                                        } else {
+                                                            swal({
+                                                                title: 'Success',
+                                                                type: 'success',
+                                                                text: '',
+                                                                showConfirmButton: false,
+                                                                timer: 1500
+                                                            });
+                                                        }
+                                                    })
+                                                })
+                                            }
+                                        })
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+</script>

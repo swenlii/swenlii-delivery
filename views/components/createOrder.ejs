@@ -1,0 +1,406 @@
+<script type="text/javascript">
+    Vue.component('create-order', {
+        name: 'createOrder',
+        props: ['userObj'],
+        data: function () {
+            return {
+                address: {
+                    formatAddress: '',
+                    country:'',
+                    countryCode:'',
+                    level_1:'',
+                    level_2:'',
+                    city: '',
+                    lat:'',
+                    long:'',
+                    route:'',
+                    house:''
+                },
+                newOrder: {
+                    title: '',
+                    description: '',
+                    payment: '',
+                    currency: 'EUR',
+                    registrationStatus: '',
+                    files: [],
+                    shippingFee: '',
+                    coastOfGoods: '',
+                    userName: '',
+                    email: '',
+                    password: '',
+                    repeatPass: '',
+                }
+            }
+        },
+        template: `<%- include ('createOrder.vue') %>`,
+        methods: {
+            repeatPasswordSuccess: function (){
+                if ($('#new-password').val().toString().length > 0 && $('#new-password').val().toString() === $('#new-repeat-password').val().toString()){
+                    $('#new-password').css('border-color', '#26a65b');
+                    $('#new-repeat-password').css('border-color', '#26a65b');
+                } else {
+                    $('#new-password').css('border-color', '#BDC4C9');
+                    $('#new-repeat-password').css('border-color', '#BDC4C9');
+                }
+            },
+            loginSubmit: function (event) {
+                if (event) event.preventDefault();
+                else return;
+
+                console.log('hello!')
+                var obj = {
+                    userName: document.getElementById('old-username2').value,
+                    password: document.getElementById('old-password2').value,
+                }
+                console.log(obj);
+                if (obj.userName.length === 0 || obj.password.length === 0){
+                    console.log('userName or password is empty');
+                    return;
+                }
+                socket.emit('login-user', obj, function (error, answer) {
+                    if (error) {
+                        swal('Error', error, 'error');
+                    } else {
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        app.$refs.createOrder.newOrder.registrationStatus = 'byId';
+                        Cookies.set('username', obj.userName, {secure: false});
+                        Cookies.set('password', obj.password, {secure: false});
+                        app.userObj = answer;
+                        $('#byIdClick').click();
+                        $('#newUserClick').removeClass('active');
+                        $('#oldUserClick').removeClass('active');
+                        $('#new-registration').removeClass('active');
+                        $('#already-registered').removeClass('active');
+                        //$('#byIdClick').addClass('active');
+                        //$('#logged-in').addClass('active');
+                    }
+                });
+            },
+            registrationSubmit: function (event) {
+                if (event) event.preventDefault();
+                else return
+                var obj = {
+                    isCustomers: 1,
+                    userName: document.getElementById('new-username').value,
+                    email: document.getElementById('new-email').value,
+                    password: document.getElementById('new-password').value,
+                    repeatPass: document.getElementById('new-repeat-password').value,
+                    regWithoutAddress: '1',
+                }
+                if (!obj.email || !obj.userName || !obj.password){
+                    swal('Error', 'Not enough data!', 'error');
+                    return
+                }
+                if (obj.password !== obj.repeatPass) {
+                    swal('Error', 'Passwords do not match!', 'error');
+                    return
+                }
+                obj.refId = Cookies.get('refid');
+                socket.emit('register-user', obj, function (error, answer) {
+                    if (error) {
+                        swal('Error', error, 'error');
+                    } else {
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        app.$refs.createOrder.newOrder.registrationStatus = 'byId';
+                        Cookies.set('username', obj.userName, {secure: false});
+                        Cookies.set('password', obj.password, {secure: false});
+                        app.userObj = answer;
+                        $('#byIdClick').click();
+                        $('#newUserClick').removeClass('active');
+                        $('#oldUserClick').removeClass('active');
+                        $('#new-registration').removeClass('active');
+                        $('#already-registered').removeClass('active');
+                        $('#byIdClick').addClass('active');
+                        $('#logged-in').addClass('active');
+                    }
+                });
+            },
+            changeRegistrationStatus: function (status) {
+                this.newOrder.registrationStatus = status;
+            },
+            createOrder: function (event) {
+                if (event) event.preventDefault();
+                if (!this.newOrder) return;
+                $('#location-new-order').css('border-color', '#BDC4C9');
+                $('#new-usernamee').removeClass('has-error');
+                $('#new-email').removeClass('has-error');
+                $('#new-password').removeClass('has-error');
+                $('#new-repeat-password').removeClass('has-error');
+                $('#old-username2').removeClass('has-error');
+                $('#old-password2').removeClass('has-error');
+                $('#select-payment').css('border-color', '#BDC4C9');
+                $('.note-editor').css('border-color', '#BDC4C9');
+                $('#shippingFee').css('border-color', '#399bff');
+                $('#coastOfGoods').css('border-color', '#399bff');
+                $('#phone_number').css('border-color', '#BDC4C9');
+                if (this.newOrder.registrationStatus === 'byId'){
+                    this.newOrder.userId = this.userObj.id;
+                }
+                else if (this.newOrder.registrationStatus === 'newUser') {
+                    this.newOrder.userName   = $('#new-username').val();
+                    this.newOrder.email      = $('#new-email').val();
+                    this.newOrder.password   = $('#new-password').val();
+                    this.newOrder.repeatPass = $('#new-repeat-password').val();
+                    if (!this.newOrder.userName || this.newOrder.userName.length === 0){
+                        swal('Error', 'Enter the name for registration.', 'error');
+                        $('#new-username').addClass('has-error');
+                        return
+                    }
+                    if (!this.newOrder.email || this.newOrder.email.length === 0){
+                        swal('Error', 'Enter the email for registration.', 'error');
+                        $('#new-email').addClass('has-error');
+                        return
+                    }
+                    if (!this.newOrder.password || this.newOrder.password.length === 0){
+                        swal('Error', 'Enter the password for registration.', 'error');
+                        $('#new-password').addClass('has-error');
+                        return
+                    }
+                    if (!this.newOrder.repeatPass || this.newOrder.repeatPass.length === 0){
+                        swal('Error', 'Retype password to register.', 'error');
+                        $('#new-repeat-password').addClass('has-error');
+                        return
+                    }
+                    if (this.newOrder.repeatPass !== this.newOrder.password) {
+                        swal('Error', 'Your registration passwords do not match.', 'error');
+                        $('#new-password').addClass('has-error');
+                        $('#new-repeat-password').addClass('has-error');
+                        return
+                    }
+                }
+                else if (this.newOrder.registrationStatus === 'oldUser') {
+                    this.newOrder.email = null;
+                    this.newOrder.userName = $('#old-username2').val();
+                    this.newOrder.password = $('#old-password2').val();
+                    if (!this.newOrder.userName || this.newOrder.userName.length === 0){
+                        swal('Error', 'Enter username to login', 'error');
+                        console.log($('#old-username2').val());
+                        $('#old-username2').addClass('has-error');
+                        return
+                    }
+                    if (!this.newOrder.password || this.newOrder.password.length === 0){
+                        swal('Error', 'Enter password to login', 'error');
+                        console.log($('#old-password2').val());
+                        console.log(this.newOrder.password);
+                        $('#old-password2').addClass('has-error');
+                        return
+                    }
+                }
+
+
+                if (!this.ini.isValidNumber()) {
+                    var error = this.ini.getValidationError();
+
+                    if (error === intlTelInputUtils.validationError.TOO_SHORT){
+                        swal('Error', 'Phone number too short' , 'error');
+                    } else if (error === intlTelInputUtils.validationError.TOO_LONG){
+                        swal('Error', 'Phone number too long' , 'error');
+                    } else if (error === intlTelInputUtils.validationError.INVALID_LENGTH){
+                        swal('Error', 'Phone number error: invalid length' , 'error');
+                    } else if (error === intlTelInputUtils.validationError.INVALID_COUNTRY_CODE){
+                        swal('Error', 'Phone number error: invalid country code' , 'error');
+                    } else if (error === intlTelInputUtils.validationError.IS_POSSIBLE){
+                        swal('Error', 'Phone number error: is possible' , 'error');
+                    } else {
+                        swal('Error', 'Phone number error: unknown error' , 'error');
+                    }
+
+                    $('#phone_number').css('border-color', '#ef4836');
+                    return
+                }
+                this.newOrder.phoneNumber = this.ini.getNumber();
+
+                if (this.newOrder.payment.length === 0) {
+                    swal('Error', 'You have not selected a payment method', 'error');
+                    $('#select-payment').css('border-color', '#ef4836');
+                    return
+                }
+
+                if (this.newOrder.currency.length === 0) {
+                    swal('Error', 'You have not selected a currency', 'error');
+                    $('#select-currency').css('border-color', '#ef4836');
+                    return
+                }
+
+                if (this.newOrder.shippingFee.length === 0 || isNaN(this.newOrder.shippingFee)){
+                    swal('Error', 'You have not entered the amount of payment for delivery or it is not a number', 'error');
+                    $('#shippingFee').css('border-color', '#ef4836');
+                    return
+                }
+
+                if (this.newOrder.coastOfGoods.length === 0 || isNaN(this.newOrder.coastOfGoods)){
+                    swal('Error', 'You have not entered the amount of the approximate price of the goods or this is not a number', 'error');
+                    $('#coastOfGoods').css('border-color', '#ef4836');
+                    return
+                }
+
+                var apartaments = $('#apartament_number').val();
+
+                if (this.address.cityId && this.address.countryId){
+                    this.newOrder.cityId = this.address.cityId;
+                    this.newOrder.countryId = this.address.countryId;
+                    this.newOrder.address = this.address.formatAddress;
+                    this.newOrder.lat = this.address.lat;
+                    this.newOrder.long = this.address.long;
+                } else {
+                    if (this.address.lat.length === 0 || this.address.long.length === 0){
+                        swal('You have not entered a address', 'To select a city, use the values ​​from the drop-down list. Start typing your city and you will see a drop-down list.', 'error');
+                        return
+                    }
+                    if (this.address.country.length === 0){
+                        swal('You have not entered a country', '', 'error');
+                        return
+                    }
+                    if (this.address.level_2.length === 0){
+                        swal('You have not entered a city', '', 'error');
+                        return
+                    }
+                    if (this.address.route.length === 0){
+                        swal('You have not entered a street', '', 'error');
+                        return
+                    }
+                    if (this.address.house.length === 0){
+                        swal('You have not entered a house number', '', 'error');
+                        return
+                    }
+
+                    this.newOrder.address = this.address.formatAddress;
+                    this.newOrder.countryCode = this.address.countryCode;
+                    this.newOrder.countryName = this.address.country;
+                    this.newOrder.city = this.address.city;
+                    this.newOrder.lat = this.address.lat;
+                    this.newOrder.long = this.address.long;
+                }
+
+                this.newOrder.apartaments = apartaments.length > 0 ? apartaments : null;
+
+                this.newOrder.description = $('.note-editable').html();
+                if (this.newOrder.description.length === 0){
+                    swal('Error', 'You do not enter an order description', 'error');
+                    $('.note-editor').css('border-color', '#ef4836');
+                    return
+                }
+                this.newOrder.refId = Cookies.get('refid');
+                console.log(JSON.stringify(this.newOrder));
+                socket.emit('postOrder', this.newOrder, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error');
+                        if (answer){ // if error in post order after register or login user
+                            console.log('user is not null')
+                            app.$refs.createOrder.newOrder.registrationStatus = 'byId';
+                            Cookies.set('username', obj.userName, {secure: false});
+                            Cookies.set('password', obj.password, {secure: false});
+                            app.userObj = answer;
+                            $('#byIdClick').click();
+                            $('#newUserClick').removeClass('active');
+                            $('#oldUserClick').removeClass('active');
+                            $('#new-registration').removeClass('active');
+                            $('#already-registered').removeClass('active');
+                            $('#byIdClick').addClass('active');
+                            $('#logged-in').addClass('active');
+                        }
+                    } else {
+                        if (answer !== 'ok'){
+                            Cookies.set('username', answer.userName, {secure: false});
+                            Cookies.set('password', answer.password, {secure: false});
+                            app.userObj = answer;
+                        }
+                        swal({
+                            title: 'Success',
+                            type: 'success',
+                            text: '',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(res => {
+                            window.location.href = '/';
+                        });
+                    }
+                });
+            }
+        },
+        mounted() {
+            //try{
+            //    setTimeout(initAutocomplete(), 1000);
+            //} catch (e) {
+            //    console.log(e.message);
+            //}
+
+            $('.selectpicker').selectpicker();
+
+            if (this.userObj) {
+                console.log('userObj')
+                //$('#logged-in').addClass('active');
+                this.newOrder.registrationStatus = 'byId';
+                if (this.userObj.cityId && this.userObj.countryId){
+                    this.address.lat = this.userObj.lat;
+                    this.address.long = this.userObj.longg;
+                    this.address.countryId = this.userObj.countryId;
+                    this.address.cityId = this.userObj.cityId;
+                    this.address.formatAddress = this.userObj.address;
+                    $('#apartament_number').val(this.userObj.apartments)
+                }
+            } else {
+                console.log('!userObj')
+                //$('#new-registration').addClass('active');
+                console.log('userObj is null: ', this.userObj);
+                this.newOrder.registrationStatus = 'newUser'
+            }
+
+            $('#summernote').summernote({
+                maximumImageFileSize: 500*1024, // 500 KB
+                callbacks:{
+                    onImageUploadError: function(msg){
+                        swal('Error', msg + ' (1 MB)', 'error');
+                    }
+                }
+            });
+
+            $("#select-payment").change(function(){
+                this.newOrder.payment = $("#select-payment").val();
+            }.bind(this)); // To set the user selected value to the data property update_result.
+
+            $("#select-currency").change(function(){
+                this.newOrder.currency = $("#select-currency").val();
+            }.bind(this)); // To set the user selected value to the data property update_result.
+
+            this.input = document.querySelector('#phone_number');
+
+            this.ini = intlTelInput(this.input, {
+                utilsScript :'/js/utils.js',
+                separateDialCode: true,
+                initialCountry: 'auto',
+                geoIpLookup: function(callback) {
+                    fetch('https://extreme-ip-lookup.com/json', {
+                        cache: 'reload'
+                    }).then(response => {
+                        if ( response.ok ) {
+                            return response.json()
+                        }
+                        throw new Error("Failed: " + response.status)
+                    }).then(ipjson => {
+                        callback(ipjson.countryCode)
+                    }).catch(e => {
+                        callback('cz')
+                    })
+                }
+            });
+
+            if (this.userObj && this.userObj.phone){
+                this.ini.setNumber(this.userObj.phone);
+            }
+        }
+
+    });
+</script>

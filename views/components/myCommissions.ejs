@@ -1,0 +1,122 @@
+<script type="text/javascript">
+    Vue.component('my-commissions', {
+        name: 'myCommissions',
+        props: ['userObj', 'orders', 'clientToken'],
+        template: `<%- include ('myCommissions.vue') %>`,
+        data: function () {
+            return {
+                commissions: [],
+                selectedOrder: 0,
+                selectedOrderArr: [],
+                paymentCount: 0
+            }
+        },
+        computed: {
+            needPayCommissions: function () {
+                var count = 0;
+                if (this.userObj.isCustomer === 0){
+                    this.orders.forEach(order => {
+                        if (order.completedOrder === 1 && !order.transactionId){
+                            count ++;
+                        }
+                    });
+                }
+                return count
+            },
+            paidCommission: function () {
+                var count = 0;
+                if (this.userObj.isCustomer === 0){
+                    this.orders.forEach(order => {
+                        if (order.transactionId){
+                            count ++;
+                        }
+                    });
+                }
+                return count
+            }
+        },
+        mounted () {
+            if (this.orders){
+                for (var i = 0; i < this.orders.length; i++){
+                    this.addToPayment(this.orders[i].id, this.orders[i].commissionCount, this.orders[i].completeDate, this.orders[i].transactionId);
+                }
+            }
+        },
+        methods: {
+            addToPayment: function (orderId, commission, complete, trans){
+                if (commission && !trans){
+                    this.selectedOrder++;
+                    this.selectedOrderArr.push(orderId);
+                    this.paymentCount += parseFloat(commission);
+                }
+            },
+            closeOrderClick: function (order) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#399bff',
+                    cancelButtonColor: '#ef4836',
+                    confirmButtonText: 'Yes, cancel the order'
+                }).then((result) => {
+                    if (result.value) {
+                        socket.emit('closeOrder', order.id, function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                swal({
+                                    title: 'Success',
+                                    type: 'success',
+                                    text: '',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(res => {
+                                    order.closeOrder = 1;
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            performedOrder: function (order) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#399bff',
+                    cancelButtonColor: '#ef4836',
+                    confirmButtonText: 'Yes, order completed'
+                }).then((result) => {
+                    if (result.value) {
+                        socket.emit('performedOrder', order.id, function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                swal({
+                                    title: 'Success',
+                                    type: 'success',
+                                    text: '',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(res => {
+                                    order.completedOrder = 1;
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            findComission: function (orderId) {
+                var commission = null;
+                this.commissions.forEach(comm => {
+                    if (comm.orderId === orderId){
+                        commission = comm;
+                    }
+                });
+                return commission;
+            }
+        }
+    });
+</script>

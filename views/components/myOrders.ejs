@@ -1,0 +1,183 @@
+<script type="text/javascript">
+    Vue.component('my-orders', {
+        name: 'myOrders',
+        props: ['userObj', 'orders', 'clientToken'],
+        template: `<%- include ('myOrders.vue') %>`,
+        data: function () {
+            return {
+                commissions: [],
+                selectedOrder: '',
+                selectedOrderArr: [],
+                paymentCount: 0
+            }
+        },
+        computed: {
+            needPayCommissions: function () {
+                var count = 0;
+                if (userObj.isCustomer === 0){
+                    this.orders.forEach(order => {
+                        if (order.completedOrder === 1 && !order.transactionId){
+                            count ++;
+                        }
+                    });
+                }
+                return count
+            },
+            paidCommission: function () {
+                var count = 0;
+                if (userObj.isCustomer === 0){
+                    this.orders.forEach(order => {
+                        if (order.transactionId){
+                            count ++;
+                        }
+                    });
+                }
+                return count
+            }
+        },
+        mounted () {
+
+        },
+        methods: {
+            addToPayment: function (orderId, commisiion){
+                if (!this.selectedOrder.includes(orderId)){
+                    $('#payment-panel').show();
+                    console.log(orderId + ' - ' + commisiion);
+                    this.selectedOrder += orderId + ', ';
+                    this.selectedOrderArr.push(orderId);
+                    this.paymentCount += commisiion;
+                    console.log(this.selectedOrder + ': ' + this.paymentCount);
+                    document.getElementById('payButton' + orderId).disabled = true;
+                    $('#payButton' + orderId).css('background', '#e4e4e4');
+                    $('#payButton' + orderId).css('color', '#58666e');
+                }
+            },
+            closeOrderClick: function (order) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#399bff',
+                    cancelButtonColor: '#ef4836',
+                    confirmButtonText: 'Yes, cancel the order'
+                }).then((result) => {
+                    if (result.value) {
+                        socket.emit('closeOrder', order.id, function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                swal({
+                                    title: 'Success',
+                                    type: 'success',
+                                    text: '',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(res => {
+                                    order.closeOrder = 1;
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            performedOrder: function (order) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#399bff',
+                    cancelButtonColor: '#ef4836',
+                    confirmButtonText: 'Yes, order completed'
+                }).then((result) => {
+                    if (result.value) {
+                        socket.emit('performedOrder', order.id, function (error, answer) {
+                            if (error) {
+                                swal('Error', error, 'error');
+                            } else {
+                                order.completedOrder = 1;
+                                swal({
+                                    title: 'Order completed.',
+                                    text: "It remains to write a review. Want to write a review now?",
+                                    type: 'success',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#399bff',
+                                    cancelButtonColor: '#ef4836',
+                                    confirmButtonText: 'Write a review'
+                                }).then(res => {
+                                    if (res.value){
+                                        Swal.fire({
+                                            title: 'Select rating for review №',
+                                            showCloseButton: true,
+                                            showCancelButton: true,
+                                            focusConfirm: false,
+                                            cancelButtonColor: '#d33',
+                                            confirmButtonText:
+                                                '<i class="fa fa-thumbs-up"></i> I like it!',
+                                            cancelButtonText:
+                                                '<i class="fa fa-thumbs-down"></i> Everything was bad!',
+                                        }).then((res) => {
+                                            if (res.dismiss !== 'close'){
+                                                console.log(res);
+                                                if (res.dismiss === 'cancel'){
+                                                    rating = '-1'
+                                                } else if (res.value === true){
+                                                    rating = '1'
+                                                }
+                                                Swal.fire({
+                                                    input: 'textarea',
+                                                    inputPlaceholder: 'Type your text here...',
+                                                    inputAttributes: {
+                                                        'aria-label': 'Type your text here'
+                                                    },
+                                                    showCancelButton: true,
+                                                    inputValidator: (value) => {
+                                                        if (!value) {
+                                                            return 'You need to write something!'
+                                                        }
+                                                    }
+                                                }).then((res) => {
+                                                    var obj = {
+                                                        orderId: order.id,
+                                                        toUserId: order.contractorId,
+                                                        fromUserId: app.userObj.id,
+                                                        text: res.value,
+                                                        raiting: rating,
+                                                    }
+                                                    console.log(obj);
+                                                    socket.emit('postReview', obj, function (error, answer) {
+                                                        if (error){
+                                                            swal('Error', error, 'error')
+                                                        } else {
+                                                            swal({
+                                                                title: 'Success',
+                                                                type: 'success',
+                                                                text: '',
+                                                                showConfirmButton: false,
+                                                                timer: 1500
+                                                            });
+                                                        }
+                                                    })
+                                                })
+                                            }
+                                        })
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            findComission: function (orderId) {
+                var commission = null;
+                this.commissions.forEach(comm => {
+                    if (comm.orderId === orderId){
+                        commission = comm;
+                    }
+                });
+                return commission;
+            }
+        }
+    });
+</script>

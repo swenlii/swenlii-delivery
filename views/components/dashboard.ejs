@@ -1,0 +1,82 @@
+<script type="text/javascript">
+    Vue.component('dashboard', {
+        name: 'dashboard',
+        props: ['orders', 'userObj', 'cities', 'myOrders'],
+        template: `<%- include ('dashboard.vue') %>`,
+        data: function () {
+            return {
+                countOrders: 6,
+                countCities: 6
+            }
+        },
+        methods: {
+            showOnlyCity: function (cityId) {
+                console.log('search by', cityId);
+                app.searchInCity(cityId);
+            },
+            allCities: function () {
+                if (this.countCities && this.countCities === this.cities.length){
+                    this.countCities = 6;
+                } else {
+                    this.countCities = this.cities.length;
+                }
+                if($('#all-cities').hasClass('panel-fullsize')) {
+                    $('#all-cities').removeClass('panel-fullsize');
+                }
+                else {
+                    $('#all-cities').addClass('panel-fullsize');
+                }
+            },
+            allOrders: function () {
+                if (this.countOrders && this.countOrders === this.orders.length){
+                    this.countOrders = 6;
+                }
+                else {
+                    this.countOrders = this.orders.length;
+                }
+                if($('#all-orders').hasClass('panel-fullsize')) {
+                    $('#all-orders').removeClass('panel-fullsize');
+                }
+                else {
+                    $('#all-orders').addClass('panel-fullsize');
+                }
+            },
+            searchInOrders: function () {
+                var searchStr = $('#searchInOrders').val();
+                searchStr = searchStr.toLowerCase();
+                console.log(searchStr);
+                if (searchStr.length > 0){
+                    var arr = [];
+                    this.orders.forEach(order => {
+                        if (order.title && order.title.toString().toLowerCase().includes(searchStr)){
+                            arr.push(order);
+                        } else if (order.name && order.name.toString().toLowerCase().includes(searchStr)){
+                            arr.push(order);
+                        }  else if (order.id && order.id.toString().toLowerCase().includes(searchStr)){
+                            arr.push(order);
+                        }
+                    });
+                    app.orders = arr;
+                } else {
+                    app.orders = <%- JSON.stringify(locals.orders) %>;
+                }
+            }
+        },
+        computed : {
+            myOrdersCount: function () {
+                if (!this.userObj || !this.orders) return null;
+                var arr = [];
+                this.orders.forEach(order => {
+                    if (order.closeOrder !== 1 && order.completedOrder !== 1){
+                        if (this.userObj.isCustomer === 0 && order.contractorId === this.userObj.id){
+                            arr.push(order);
+                        } else if (this.userObj.isCustomer === 1 && order.userId === this.userObj.id){
+                            arr.push(order);
+                        }
+                    }
+                })
+                return arr.length;
+            }
+        }
+    });
+</script>

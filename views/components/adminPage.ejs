@@ -1,0 +1,93 @@
+<script type="text/javascript">
+    Vue.component('admin-page', {
+        name: 'adminPage',
+        props: ['userObj'],
+        template: `<%- include ('adminPage.vue') %>`,
+        data: function () {
+            return {
+                persons: [],
+            }
+        },
+        mounted () {
+            if (this.userObj && this.userObj.id === 1){
+                socket.emit('getUsersWithRegRefId', function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error')
+                    } else {
+                        app.$refs.adminPage.persons = answer;
+                        console.log(app.$refs.adminPage.persons);
+                    }
+                });
+            }
+        },
+        methods: {
+            paidShare: function (user, needPaid) {
+                if (needPaid >= 5){
+                    if (user.paymentType && user.paymentInfo) {
+                        swal({
+                            title: 'Pay to user',
+                            text: 'Here is his billing information: \n Type: ' + user.paymentType + ' \n ' + (user.paymentType === 'bank' ? 'CardNumber' : 'Paypal info') + ': ' + user.paymentInfo,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'I paid, notify the user'
+                        }).then(
+                            (result) => {
+                                if (result.value) {
+                                    socket.emit('paidToUser', {
+                                        userId: user.id,
+                                        needPaid: needPaid
+                                    }, function (error, answer) {
+                                        if (error) {
+                                            swal('Error', error, 'error');
+                                        } else {
+                                            for (var i = 0; i < app.$refs.adminPage.persons.length; i++) {
+                                                if (app.$refs.adminPage.persons[i].id === userId) {
+                                                    app.$refs.adminPage.persons[i].historicalPaid = needPaid + (app.$refs.adminPage.persons[i].historicalPaid ? app.$refs.adminPage.persons[i].historicalPaid : 0);
+                                                }
+                                            }
+                                            swal({
+                                                title: 'Success',
+                                                type: 'success',
+                                                text: '',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    } else {
+                        swal({
+                            title: 'The user did not provide payment details.',
+                            text: 'Send him a email?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Send email'
+                        }).then((result) => {
+                            if (result.value) {
+                                socket.emit('sendEmailNotPaymentDetails', {username: user.name, email: user.email}, function (error, answer) {
+                                    if (error){
+                                        swal('Error', error, 'error');
+                                    } else {
+                                        swal({
+                                            title: 'Success',
+                                            type: 'success',
+                                            text: '',
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    });
+</script>

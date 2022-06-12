@@ -1,0 +1,62 @@
+<script type="text/javascript">
+    Vue.component('personal-area', {
+        name: 'personalArea',
+        props: ['userObj'],
+        template: `<%- include ('personalArea.vue') %>`,
+        data: function () {
+            return {
+                link : this.userObj.myRefId && this.userObj.myRefId.length > 0 ? 'https://swenlii-delivery.ru/data/' + this.userObj.myRefId :'',
+                persons: [],
+                paidType: this.userObj.paymentType,
+                paidInfo: this.userObj.paymentInfo
+            }
+        },
+        methods: {
+            createRefLink: function () {
+                if (!this.userObj.myRefId){
+                    socket.emit('generateRefId', this.userObj.id, function (error, answer) {
+                        if (error){
+                            swal('Error', error, 'error');
+                        } else {
+                            app.$refs.personalArea.link = 'https://swenlii-delivery.ru/data/' + answer;
+                            app.userObj.myRefId = answer;
+                            console.log(answer);
+                        }
+                    });
+                } else {
+                    this.link = 'https://swenlii-delivery.ru/data/' + this.userObj.myRefId;
+                    console.log(this.link);
+                }
+            },
+            copyLink: function () {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val(this.link).select();
+                document.execCommand("copy");
+                $temp.remove();
+            }
+        },
+        mounted() {
+            if (this.userObj && this.userObj.myRefId){
+                socket.emit('getUsersRegMyRefId', this.userObj.myRefId, function (error, answer) {
+                    if (error){
+                        swal('Error', error, 'error')
+                    } else {
+                        app.$refs.personalArea.persons = answer;
+                        console.log(app.$refs.personalArea.persons);
+                    }
+                });
+            }
+
+        },
+        computed: {
+            earnedAllTime: function () {
+                var earn = 0.0;
+                for (var i = 0; i < this.persons.length; i++){
+                    earn = earn + parseFloat(this.persons[i].needPaid);
+                }
+                return earn;
+            }
+        }
+    });
+</script>

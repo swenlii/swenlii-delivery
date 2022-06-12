@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Kode is a Premium Bootstrap Admin Template, It's responsive, clean coded and mobile friendly">
+    <meta name="keywords" content="bootstrap, admin, dashboard, flat admin template, responsive,"/>
+    <title><%- locals.title %></title>
+
+    <!-- ========== Css Files ========== -->
+    <link href="/css/root.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            background: #F5F5F5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-form">
+    <form id="register-form" action="#" class="form-horizontal">
+        <div class="top">
+            <h1>Register</h1>
+            <h4>Join to our community now !</h4>
+        </div>
+        <div class="group panel-body" style="margin: 20px 0px -20px 0px; text-align: center; padding: 0px 40px">
+            <div class="col-md-12 col-lg-6">
+                <a style="cursor: pointer" class="btn btn-rounded btn-primary" id="isCustomer"><i class='fa fa-user'></i> Customer</a>
+            </div>
+            <div class="col-md-12 col-lg-6">
+                <a style="cursor: pointer" class="btn btn-rounded btn-default" id="isCourier"><i class='fa fa-truck'></i> Courier</a>
+            </div>
+        </div>
+        <div class="form-area">
+            <div class="group">
+                <input id="username" type="text" class="form-control" placeholder="Username" min="3" max="300" required>
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="group">
+                <input id="email" type="text" class="form-control" placeholder="E-mail" min="4" max="150" equired>
+                <i class="fa fa-envelope-o"></i>
+            </div>
+            <div class="group">
+                <input id="password" type="password" class="form-control" placeholder="Password" min="6" max="150" required>
+                <i class="fa fa-key"></i>
+            </div>
+            <div class="group">
+                <input id="repeat-password" type="password" class="form-control" min="6" max="150" placeholder="Password again">
+                <i class="fa fa-key"></i>
+            </div>
+
+            <div class="address-div">
+
+            </div>
+            <div class="address-div">
+                <div class="group" style="color: #26a65b">
+                    You will receive emails if orders appear 15 km from you.
+                </div>
+                <div class="group">
+                    <input id="autocomplete" type="text" class="form-control" placeholder="Your address">
+                    <i class="fa fa-map-marker"></i>
+                </div>
+                <div class="group" id="specifyAddress" style="display: none; color: #ef4836">
+                    Specify the address. Enter the city, street, house. Or check the location on the map.
+                </div>
+                <div class="group" style="display: none" id="map-under-address">
+                    <div style="min-height: 350px;" id="map">
+
+                    </div>
+                </div>
+            </div>
+            <div class="group address-div">
+                <input id="country" type="text" class="form-control" placeholder="Country" disabled>
+                <i class="fa fa-flag"></i>
+            </div>
+            <div class="group address-div">
+                <input id="administrative_area_level_2" type="text" class="form-control" placeholder="City" disabled>
+                <i class="fa fa-building-o"></i>
+            </div>
+            <div class="group address-div">
+                <input id="route" type="text" class="form-control" placeholder="Street" disabled>
+                <i class="fa fa-road"></i>
+            </div>
+            <div class="group address-div" id="house_number" style="display: none">
+                <input id="street_number" type="text" class="form-control" placeholder="Home" disabled>
+                <i class="fa fa-home"></i>
+            </div>
+            <button type="submit" class="btn btn-default btn-block">REGISTER NOW</button>
+        </div>
+    </form>
+    <div class="footer-links row">
+        <div class="col-xs-6"><a href="/login"><i class="fa fa-sign-in"></i> Login</a></div>
+        <div class="col-xs-6 text-right"><a href="/forgot-password"><i class="fa fa-lock"></i> Forgot password</a></div>
+    </div>
+</div>
+
+<!-- ================================================
+jQuery Library
+================================================ -->
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+
+<!-- ================================================
+Bootstrap Core JavaScript File
+================================================ -->
+<script src="/js/bootstrap/bootstrap.min.js"></script>
+
+
+<!-- ================================================
+Bootstrap Select
+================================================ -->
+<script type="text/javascript" src="/js/bootstrap-select/bootstrap-select.js"></script>
+
+<!-- ================================================
+Bootstrap Toggle
+================================================ -->
+<script type="text/javascript" src="/js/bootstrap-toggle/bootstrap-toggle.min.js"></script>
+
+<!-- ================================================
+Moment.js
+================================================ -->
+<script type="text/javascript" src="/js/moment/moment.min.js"></script>
+
+<!-- ================================================
+Bootstrap Date Range Picker
+================================================ -->
+<script type="text/javascript" src="/js/date-range-picker/daterangepicker.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="/js/socket.js"></script>
+<script src="/js/sweetalert2.all.min.js"></script>
+<script src="/js/js.cookie.min.js"></script>
+
+<script> var thisUrl = location.protocol + '//' + location.host;
+    var socket = io.connect(thisUrl);
+
+    Number.prototype.trimNum = function (places, rounding) {
+        rounding = rounding || "round";
+        var num = parseFloat(this), multiplier = Math.pow(10, places);
+        return (Number(Math[rounding](num * multiplier) / multiplier));
+    }
+
+</script>
+
+<script>
+    let isCusomers = false;
+    let addr = 'https://maps.googleapis.com/maps/api/js?key='+ '<%=locals.mapsGoogleApiKey%>' + '&libraries=places&callback=initAutocomplete';
+    this.googleAutocomplete = document.createElement('script')
+    this.googleAutocomplete.setAttribute('src', addr)
+    this.googleAutocomplete.async = true
+    this.googleAutocomplete.defer = true
+    document.head.appendChild(this.googleAutocomplete)
+    document.getElementById('password').oninput =        () => {repeatPasswordSuccess();};
+    document.getElementById('repeat-password').oninput = () => {repeatPasswordSuccess();};
+    $('#isCustomer').css('background-color', '#399bff').css('color', 'white').click(function () {isCustomerChange(1);});
+    $('#isCourier').css('background-color', '#e4e4e4').css('color', '#58666e').click(function () {isCustomerChange(0);});
+    $('.address-div').css('display', 'none');
+    isCusomers = true;
+
+    console.log(Cookies.get('refid'))
+
+    $('#register-form').submit(function (event) {
+        event.preventDefault();
+        var obj = {
+            isCustomers: isCusomers === true ? 1 : 0,
+            userName: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password:   document.getElementById('password').value,
+            repeatPass: document.getElementById('repeat-password').value
+        }
+        if (!obj.email) {
+            swal('Error', 'You did not enter an email', 'error');
+            return
+        }
+        if (!obj.userName) {
+            swal('Error', 'You did not enter an username', 'error');
+            return
+        }
+        if (obj.isCustomers !== 1 && obj.isCustomers !== 0) {
+            swal('Error', 'Your account type is not defined' + !obj.isCustomers, 'error');
+            return
+        }
+        if (!obj.password){
+            swal('Error', 'You did not enter an password', 'error');
+            return
+        }
+        if (obj.password !== obj.repeatPass) {
+            swal('Error', 'Passwords do not match!', 'error');
+            return
+        }
+        if (obj.isCustomers === 0) {
+            var country = $('#country').val();
+            var level_2 = $('#administrative_area_level_2').val();
+            var route =   $('#route').val();
+            var house =   $('#street_number').val();
+
+            if (lat.length === 0 || long.length === 0){
+                swal('You have not entered a address', 'To select a city, use the values ​​from the drop-down list. Start typing your city and you will see a drop-down list.', 'error');
+                return
+            }
+
+            if (country.length === 0){
+                swal('You have not entered a country', '', 'error');
+                return
+            }
+            if (level_2.length === 0){
+                swal('You have not entered a city', '', 'error');
+                return
+            }
+            if (route.length === 0){
+                swal('You have not entered a street', '', 'error');
+                return
+            }
+
+            obj.address = country + (level_1 && level_1.length > 0 ? ', ' + level_1 : '') + ', ' + level_2 + ', ' + route + ' ' + house;
+            obj.lat = lat;
+            obj.long = long;
+            obj.countryCode = countryCode;
+            obj.countryName = country;
+            obj.city = city;
+        }
+        obj.refId = Cookies.get('refid');
+        console.log(obj);
+        socket.emit('register-user', obj, function (error, answer) {
+            if (error) {
+                swal('Error', error, 'error');
+            } else {
+                swal({
+                    title: 'Success',
+                    type: 'success',
+                    text: '',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(res => {
+                    Cookies.set('username', obj.userName, {expires: 365, secure: false});
+                    Cookies.set('password', obj.password, {expires: 365, secure: false});
+                    window.location.href = '/';
+                });
+            }
+        });
+    });
+
+    function repeatPasswordSuccess (){
+        if ($('#password').val().toString().length > 0 && $('#password').val().toString() === $('#repeat-password').val().toString()){
+            $('#password').css('border-color', '#26a65b');
+            $('#repeat-password').css('border-color', '#26a65b');
+        } else {
+            $('#password').css('border-color', '#BDC4C9');
+            $('#repeat-password').css('border-color', '#BDC4C9');
+        }
+    }
+
+    function isCustomerChange(isCustomer) {
+        if (isCustomer === 1){
+            $('#isCustomer').css('background-color', '#399bff').css('color', 'white');
+            $('#isCourier').css('background-color', '#e4e4e4').css('color', '#58666e');
+            $('.address-div').css('display', 'none');
+            isCusomers = true;
+            console.log(isCusomers === true);
+        } else {
+            $('#isCourier').css('background-color', '#399bff').css('color', 'white');
+            $('#isCustomer').css('background-color', '#e4e4e4').css('color', '#58666e');
+            $('.address-div').css('display', 'block');
+            isCusomers = false;
+            console.log(isCusomers === true);
+        }
+    }
+
+    var placeSearch, autocomplete;
+    var lat, long, countryCode, level_1, city;
+    var geocoder;
+    var map;
+    var marker;
+    var infowindow;
+    var componentForm = {
+        //These are inputs that are locked at the beginning.
+        route: 'long_name',
+        administrative_area_level_2: 'long_name',
+        country: 'long_name'
+    };
+
+    function setPlace(place) {
+        $('#house_number').css('display', 'none');
+        $('#specifyAddress').css('display', 'none');
+
+        if (!place || !place.address_components || !place.geometry || !place.geometry.location){
+            console.error('Error! Place is null!');
+            document.getElementById('country').value = '';
+            document.getElementById('administrative_area_level_2').value = '';
+            document.getElementById('route').value = '';
+            lat = "";
+            long = "";
+            city = "";
+            return;
+        }
+
+        console.log(place.address_components);
+
+        for (var component in componentForm) {
+            document.getElementById(component).value = '';
+            document.getElementById(component).disabled = false;
+        }
+
+        lat = place.geometry.location.lat();
+        long = place.geometry.location.lng();
+
+        place.address_components.forEach(el => {
+            console.log(el.types[0]);
+            if (el.types[0] === "street_number"){
+                document.getElementById('street_number').disabled = true;
+                $('#house_number').css('display', 'block');
+                $('#street_number').val(el.short_name);
+            }
+            if (el.types[0] === "route"){
+                document.getElementById('route').disabled = true;
+                document.getElementById('route').value = el.short_name;
+            }
+            if (el.types[0] === "administrative_area_level_1"){
+                level_1 = el.short_name;
+            }
+            if (el.types[0] === "locality"){
+                document.getElementById('administrative_area_level_2').disabled = true;
+                $('#administrative_area_level_2').val(el.short_name);
+                city = el.long_name;
+            }
+            if (el.types[0] === "country"){
+                document.getElementById('country').disabled = true;
+                countryCode = el.short_name;
+                $('#country').val(el.long_name);
+            }
+        })
+
+        let locality = place.address_components.find(function(el) {
+            return el.types[0] === 'locality';
+        });
+        if (!locality){
+            locality = place.address_components.find(function(el) {
+                return el.types[0] === 'sublocality_level_1';
+            });
+            if (locality){
+                document.getElementById('administrative_area_level_2').disabled = true;
+                $('#administrative_area_level_2').val(locality.short_name);
+                locality = locality.long_name;
+            }
+        }
+
+        if (!locality){
+            locality = place.address_components.find(function(el) {
+                return el.types[0] === 'administrative_area_level_2';
+            });
+            if (locality){
+                document.getElementById('administrative_area_level_2').disabled = true;
+                $('#administrative_area_level_2').val(locality.short_name);
+                locality = locality.long_name;
+            }
+        }
+
+        if (document.getElementById('administrative_area_level_2').disabled === false || document.getElementById('route').disabled === false){
+            $('#specifyAddress').css('display', 'block');
+            console.log('address is incorrect')
+            if (document.getElementById('administrative_area_level_2').disabled === false) {
+                console.log('city not found');
+                var options = {
+                    types: ['(cities)'],
+                    componentRestrictions: {country: countryCode}
+                };
+
+                var input = document.getElementById('administrative_area_level_2');
+                var autocomplete = new google.maps.places.Autocomplete(input, options);
+                autocomplete.addListener('place_changed', function () {
+                    setPlace(autocomplete.getPlace());
+                    showMap();
+                    document.getElementById('administrative_area_level_2').disabled = true;
+                    var boundsByCity = autocomplete.getPlace().geometry.viewport;
+                    var routeOptions = {
+                        bounds: boundsByCity,
+                        componentRestrictions: {country: countryCode},
+                        types: ['address']
+                    };
+                    var routeAuto = new google.maps.places.Autocomplete(document.getElementById('route'), routeOptions);
+                    routeAuto.addListener('place_changed', function () {
+                        document.getElementById('administrative_area_level_2').disabled = true;
+                        setPlace(routeAuto.getPlace());
+                        showMap();
+                    });
+                });
+            }
+            else if (document.getElementById('route').disabled === false) {
+                console.log('street not found');
+                document.getElementById('administrative_area_level_2').disabled = true;
+                var boundsByCity = place.geometry.viewport;
+                var routeOptions = {
+                    bounds: boundsByCity,
+                    componentRestrictions: {country: countryCode},
+                    types: ['address']
+                };
+                var routeAuto = new google.maps.places.Autocomplete(document.getElementById('route'), routeOptions);
+                routeAuto.addListener('place_changed', function () {
+                    document.getElementById('administrative_area_level_2').disabled = true;
+                    setPlace(routeAuto.getPlace());
+                    showMap();
+                });
+            }
+        }
+
+
+        if (document.getElementById('administrative_area_level_2').disabled === true){
+            console.log('city found: ', document.getElementById('administrative_area_level_2').disabled)
+            showMap();
+        }
+    }
+
+    function showMap() {
+        $('#map-under-address').css('display', 'block');
+        var myLatlng = new google.maps.LatLng(lat, long);
+        var mapOptions = {
+            zoom: 17,
+            center: myLatlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            gestureHandling: 'greedy'
+        }
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        marker = new google.maps.Marker({
+            position: myLatlng,
+            map: map,
+            title: 'Hello World!',
+            draggable: true
+        });
+
+        google.maps.event.addListener(marker, 'dragend', function() {
+            geocodePosition(marker.getPosition());
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+            if (marker.formatted_address) {
+                infowindow.setContent(marker.formatted_address);
+            } else {
+                infowindow.setContent($('#autocomplete').val());
+            }
+            infowindow.open(map, marker);
+        });
+        google.maps.event.trigger(marker, 'click');
+    }
+
+    function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+            {types: ['geocode']});
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        autocomplete.addListener('place_changed', () => fillInAddress(autocomplete.getPlace()));
+        infowindow = new google.maps.InfoWindow({
+            size: new google.maps.Size(150, 50)
+        });
+        geocoder = new google.maps.Geocoder();
+    }
+
+    function fillInAddress(place) {
+        $('#house_number').css('display', 'none');
+        $('#specifyAddress').css('display', 'none');
+
+        setPlace(place);
+
+        console.log('End.');
+    }
+
+    function geocodePosition(pos) {
+        console.log('geocode now')
+        geocoder.geocode({
+            latLng: pos
+        }, function(responses) {
+            if (responses && responses.length > 0) {
+                $('#specifyAddress').css('display', 'none');
+                $('#autocomplete').val(responses[0].formatted_address);
+                marker.formatted_address = responses[0].formatted_address;
+                setPlace(responses[0]);
+            } else {
+                marker.formatted_address = 'Cannot determine address at this location.';
+            }
+            infowindow.setContent(marker.formatted_address);
+            infowindow.open(map, marker);
+        });
+    }
+</script>
+
+</body>
+</html>
