@@ -9,7 +9,7 @@
 > ⚠️ **ВНИМАНИЕ!** ⚠️ Не скачивайте проект. Только для чтения. 
 
 <div align="center">
-<img src="public/img/deliv-1.webp" width="600px">
+<img src="https://swenlii.github.io/img/projects/delivery.png" width="700px">
 </div>
 
 ## ⚡Описание проекта
